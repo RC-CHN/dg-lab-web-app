@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dg-lab-web-app
+data:
+  # Set the exact browser origin in your deployment overlay.
+  APP_ORIGIN: http://localhost:8787

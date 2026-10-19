@@ -13,6 +13,8 @@
 
 镜像：`ghcr.io/rc-chn/dg-lab-web-app`。
 
+Kubernetes / K3s 使用 [集群部署说明](KUBERNETES.md) 和 `deploy/kubernetes`；下面的 SSH Deploy 工作流用于 Docker Compose 服务。
+
 | 标签 | 用途 |
 | --- | --- |
 | `latest` | 最近通过检查的 main，方便体验 |

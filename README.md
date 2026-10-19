@@ -51,6 +51,8 @@ docker compose --profile https up -d --build
 
 镜像部署、自动发布、可选 SSH 部署及回滚见 [CI/CD](docs/CI-CD.md)。
 
+集群部署使用 [Kubernetes / K3s 清单与说明](docs/KUBERNETES.md)，支持 Harbor 代理镜像。
+
 ## 开发与验证
 
 ```bash
