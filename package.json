@@ -1,0 +1,39 @@
+{
+  "name": "dg-lab-web-app",
+  "version": "1.8.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env server/index.mjs --dev",
+    "build": "vite build",
+    "start": "node --env-file-if-exists=.env server/index.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "dev:qa": "node tests/ui-server.mjs",
+    "test:ui": "node scripts/test-ui.mjs",
+    "test:container": "node tests/production-browser.mjs",
+    "check:public": "node scripts/check-public.mjs",
+    "release:archive": "node scripts/package-release.mjs"
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.1.3",
+    "express": "^5.1.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.4.0",
+    "vite": "^6.3.0",
+    "@playwright/test": "^1.51.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "description": "Self-hosted COYOTE 2.0 remote control panel with themed Web UI, live scope and collaborative playback",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RC-CHN/dg-lab-web-app.git"
+  }
+}

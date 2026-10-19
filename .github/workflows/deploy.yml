@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Published image tag: sha-<40 hex> or v1.8.0 (never latest)'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Deploy a published image via SSH
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ inputs.tag }}
+          REPOSITORY: ${{ github.repository }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_TAG" =~ ^(sha-[a-f0-9]{40}|v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?)$ ]]
+          [[ "$DEPLOY_HOST" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]]
+          [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$DEPLOY_PATH" =~ ^/[A-Za-z0-9_/-]+$ && "$DEPLOY_PATH" != *..* ]]
+          test -n "$DEPLOY_SSH_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          install -m 700 -d "$RUNNER_TEMP/deploy-ssh"
+          trap 'rm -rf "$RUNNER_TEMP/deploy-ssh"' EXIT
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$RUNNER_TEMP/deploy-ssh/key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$RUNNER_TEMP/deploy-ssh/known_hosts"
+          chmod 600 "$RUNNER_TEMP/deploy-ssh/"*
+          image="ghcr.io/${REPOSITORY,,}:$IMAGE_TAG"
+          ssh -i "$RUNNER_TEMP/deploy-ssh/key" \
+            -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$RUNNER_TEMP/deploy-ssh/known_hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" "bash -s -- '$image' '$DEPLOY_PATH'" < scripts/deploy.sh

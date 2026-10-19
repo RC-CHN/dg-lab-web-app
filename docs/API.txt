@@ -1,0 +1,118 @@
+面板同源 HTTP API
+================
+先 GET /api/state，保存响应 Cookie 与 csrf。所有 POST 均为 JSON，并带
+X-Panel-CSRF: <csrf>。浏览器 Origin 必须匹配 APP_ORIGIN。
+登录账号、官方令牌、房间 connectToken 不会从 /api/state 返回。
+真实管理/控制接口统一要求管理员认证；未认证返回401。公开演示只操作独立DemoRoom。
+管理员登录/退出轮换Cookie与csrf；客户端必须采纳新响应，重连SSE。
+未认证state/SSE不返回真实账号、房间、设备、日志或邀请信息。
+
+GET /healthz               健康检查，不创建会话
+GET /api/state             admin:{configured,authenticated,expiresAt} / user/demo/room/devices/limits/players/logs/controlEpoch/csrf
+GET /api/events            SSE，同 /api/state 的实时状态；后台任务不依赖此连接续期
+GET /api/presets           24 个内置波形（id/name/content/frames/official）
+
+POST /api/admin/login      {password} 面板管理员口令，返回完整state；有效8小时
+POST /api/admin/logout     {} 立即撤权、停止、断开房间并撤销邀请，返回新的匿名state
+
+POST /api/login            {phone,password,phoneCountryCode:"86"} 或 {email,password} 或 {token}
+POST /api/logout           {}
+POST /api/demo             {enabled:true|false}
+POST /api/room/join        {code:"远程码或邀请链接",password?:"房间密码"}
+POST /api/room/leave       {}
+POST /api/room/refresh     {}
+POST /api/device/attach    {id:0}    显式接管；加入不会自动接管
+POST /api/device/detach    {id:0}    停止并释放
+POST /api/stop             {}       停止全部本面板任务，并双通道归零/暂停
+POST /api/limit            {id:0,channel:0,value:100}，value 整数0..200；null 清除自设上限
+                           默认直接跟随 slotState.channelA/B.intensityMax，未知时可发送强度上限为0
+POST /api/control          {id:0,channel:0,action:"set",value:20}
+                           action:add 使用整数增量，服务器转换为有上限的绝对目标
+                           action:mute 使用布尔 value（true 暂停）
+                           action:boost 使用非负整数增量和 duration:1000..30000 ms
+POST /api/feel             {id:0,feel:11}，官方短语枚举1..16
+
+POST /api/player/start     {id:0,channel:0,queue:[{presetId:"1",seconds:30}],loop:false,scale:100}
+                           自定义队列项用 {name,frames:[[x,y,z],...],seconds} 替代 presetId
+                           queue 1..30 段，每段1..600秒；scale 0..100（波形幅值）
+                           timing?:{delay:0,stopAfter:0,interval:null|{work:[30,30],rest:[10,10]}}
+                           delay/stopAfter单位秒，整数0..86400，0关闭；stopAfter从延时结束计算，包含休息时间
+                           work/rest为秒范围，整数1..3600，最小<=最大；相同为固定时间，否则均匀抽取整数
+                           延时/休息时发送零波形，冻结帧和段进度；后台、停止、断线规则与普通队列一致
+POST /api/player/stop      {id:0,channel:0}，只停止该通道基础波形播放
+POST /api/pulse/import     {content:"Dungeonlab+pulse:...",name:"波形名"}
+POST /api/pulse/custom     {name,frequency:30,amplitude:50,shape:"sine",seconds:2}
+                           frequency 1..100Hz；amplitude 0..100；seconds 1..30
+                           shape: sine/flat/pulse/ramp；生成结果加入自定义队列
+
+POST /api/touch            {id:0,channel:0,epoch:<controlEpoch>,active:true,x:0.5,y:0.5}
+                           x/y 左至右、上至下0..1；使用官方默认四节点映射
+                           可选 swapAxes、mode:classic|gradient、gradientMode:both|left|right
+                           intensity/frequency 可传2..6个 {position,value} 节点
+                           两轴首尾位置0和1，位置严格递增；幅值0..100%，周期10..100ms
+                           节奏格使用 presetId 代替 x/y
+                           每125ms续期；active:false 释放，只撤销触控覆盖
+POST /api/fire             {id:0,channel:0,epoch:<controlEpoch>,active:true,value:1}
+                           按住临时增量1..30；每125ms续期；active:false 释放
+                           不改变波形，不启动新播放器
+
+channel 0=A，1=B；id 是服务器设备描述的数字 id，不是字符串 slotId。
+epoch 来自最新状态；归零/释放控制后会更新，用旧 epoch 的持按请求被拒绝。
+控制接口的 sent 表示命令已发送，不表示硬件已执行；显示值取设备 props 回传。
+API 测试应使用 /api/demo 或 mock，不要用生产账号回归输出操作。
+
+协议来源与实现对照见 PARITY.txt。核心实现位于 server/dg-api.mjs 和 server/room.mjs。
+项目可独立构建部署，不依赖外部逆向分析目录。
+
+实验室 API
+===========
+POST /api/lab/start {id,epoch,revision,config} 返回当前runId、epoch、revision、运行状态。
+  revision取自最新 /api/state 的lab.revision；开始/停止递增，旧开始请求返回409。
+  config共有：mode、label、source（页面标识）、channels:[0,1]、duration:1..1800（秒）。
+  tracks：tracks:[framesA,framesB]、loop布尔；每轨最多6000帧。
+  mix：left/right波形数组、mix:0..100、bpm:30..200、quantize、alternate。
+  tempo：waves:[frames,...]（1..30个）、bpm:30..200、switchEvery:1..16；服务器生成手动节拍。
+  stream：随后通过update发送frames:[frameA,frameB]。
+  coop：coopMode:split|channels、swapSeconds:0..120；需有效协作者在线。
+  scene：nodes:[{title,frames,seconds,choices:[{label,to}]}]；to为节点索引，-1为结束。
+POST /api/lab/update {runId,epoch,seq,...patch} seq严格递增；最新sequence在lab公开状态中返回。
+  mix可更新mix/bpm；tempo可更新bpm；stream可更新frames；coop更新input中的当前角色字段。
+  只有stream/coop及绑定远程选择者的scene需要续期（1200ms租约）；前端每100ms/200ms更新。
+  tracks/mix/tempo及普通scene为autonomous，页面退出后继续至duration或显式停止；不能用config把实时输入强制设为autonomous。
+POST /api/lab/choose {runId,epoch,node,revision,choice} 选择当前等待节点的选项索引。
+POST /api/lab/stop {runId,epoch} 只停止对应实验，不改变基础强度；返回新的lab状态与revision。
+
+POST /api/coop/create {id,role,minutes} role为amplitude/channelB/choice；minutes 1..60。
+  返回一次性邀请token；推荐构造同源 /#invite=<token> 链接。
+POST /api/coop/revoke {} 主面板撤销当前邀请。
+POST /api/coop/inspect {token} 查看角色、是否已兑换、是否演示与到期时间。
+POST /api/coop/join {token} 将邀请绑定到当前独立会话，不能与主端同会话。
+POST /api/coop/heartbeat {} 协作端每250ms续期；无法续期时不继续控制。
+POST /api/coop/input {runId,epoch,seq,input:{amplitude}} 或channelB的{amplitude,period}；seq在同一次run内严格递增。
+POST /api/coop/choose {runId,epoch,node,revision,choice} 仅choice角色可用。
+POST /api/coop/stop {runId,epoch} 协作者仅能停止邀请对应模式的该次实验。
+POST /api/coop/exit {} 退出并作废邀请，恢复自己的独立会话。
+  guest态的 /api/state 和SSE只返回独立csrf、角色、公开实验状态，不返回主端会话信息。
+  所有guest可用API由服务端白名单限定，其他操作返回403。
+
+示波与反馈状态（GET /api/state 和 SSE）
+======================================
+serverTime：服务器毫秒时间戳，供客户端绘图对齐，不依赖手机时钟。
+scope：按设备隔离的数组，每项{deviceId,frames:[frameA,frameB],lastSentAt:[msA,msB],samples}。
+  samples每项为[timestamp,xA,yA,zA,xB,yB,zB]，最近8秒，最多82条；采样10Hz，通常5Hz推送。
+  只记录成功send后的V2波形命令；p=2覆盖p=1，任务到期后回退，未发送或已到期显示零帧。
+  不记录/伪造电流或电压，不把强度/开火指令转换为波形，不代表硬件已执行。
+  guest/匿名会话不能获取管理员的scope或设备回传明细。
+devices[].propsUpdatedAt / slotUpdatedAt：首次接管同步或相应状态补丁的接收时间，非持续测量时间。
+devices[].feedback：最近ev=4/type=0快捷反馈，{time,action,feel}，feel对应官方1..16短语。
+players[]额外字段：autonomous:true、loop、runStartedAt；startedAt仍为当前队列段开始时间。
+  phase:delay|playing|rest，phaseUntil为下一阶段切换的服务器时间；stopAt为定时停止时间或null。
+  elapsedMs为当前段已实际播放时长，剔除延时和间隔休息，用于进度条。
+lab额外字段：autonomous、source、sequence、loop；原runId/epoch用于恢复界面后操作同一个任务。
+  后台任务不受浏览器SSE退出影响；无任务且无浏览器时15秒退房，管理员认证到期仍强制停止并退出。
+
+2.0回传来源：APK模块6049远程适配器M.syncPropsFromConsole / syncSlotStateFromConsole。
+  props实际同步intensityA/intensityB；connectState表示远程接管状态。
+  slotState.hasDevice为房主设备连接状态，markLight为标记灯；每通道含comfortLimit、intensityMax、isMuted、warmUpScale。
+  comfortLimit含mode、comfortMax、absoluteMax、overheat、overheatPercent、autoIncr、autoIncrMax、autoIncrScope、totalIncr。
+  power/version/label在适配器中只初始化默认值，不能当成可靠远程电量/版本。

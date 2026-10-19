@@ -1,0 +1,40 @@
+Third-party provenance and license scope
+=======================================
+
+The project-authored Web UI, server, scripts and documentation are provided
+under GPL-3.0-only (LICENSE). This grant does not relicense the following
+third-party material or imply that its complete source is available.
+
+vendor/security-glue.js and vendor/security.wasm
+  Extracted from the user-supplied DG-LAB Android APK 4.2.5:
+  dglab_online_425_0903_234051.apk, modules 38646 / 68906 and their WASM asset.
+  Used by the official-account request encryption/decryption adapter.
+  These files are included to preserve the requested account/room functionality.
+  No separate redistribution license or WASM source license was identified in
+  the supplied material. They are excluded from this project's GPL grant.
+  They are not account credentials, a login token, or a locally generated key.
+  The original WASM retains upstream compiler source paths. The public-file
+  checker recognizes that unmodified binary by SHA-256; this is not a blanket
+  exemption for changed files, local paths elsewhere, or credential patterns.
+
+shared/presets.json
+  Built-in waveform data and protocol tables extracted from the supplied APK,
+  modules 74910 / 63022. The original data is retained for compatible playback.
+  No separate license for these resources was identified; the project GPL grant
+  does not grant additional rights in that third-party data.
+
+vendor/dglab-kit.LICENSE
+  Upstream GPL-3.0 license from https://github.com/dungeonlab-open/dglab-kit.
+  Protocol and V2 waveform research consulted that project. Its license does
+  not license the Android APK assets above. The dglab-kit package is not a
+  runtime dependency of this application.
+
+tests/fixtures/v2-golden.json
+  Small interoperability vectors produced by exercising the supplied APK's V2
+  generator against synthetic inputs. No APK executable code is in this file.
+
+Dependencies
+  NPM dependency versions and their source locations are in package-lock.json;
+  their own licenses apply. npm ci installs their original license notices.
+  Third-party logos, screenshots, the APK and the full decompiled application
+  are not included. The project is not affiliated with DG-LAB.

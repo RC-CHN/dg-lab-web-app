@@ -1,0 +1,17 @@
+node_modules
+dist
+.env
+.env.*
+private
+test-results
+playwright-report
+*.log
+.git
+.github
+artifacts
+coverage
+*.apk
+*.pem
+*.key
+credentials*
+secrets*

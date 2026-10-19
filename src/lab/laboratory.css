@@ -1,0 +1,640 @@
+.laboratory {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.lab-intro {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 22px;
+  background: linear-gradient(110deg, #302d24, #1c2b29);
+  border: 1px solid #4d4939;
+  border-radius: 10px;
+  color: #dac7a4;
+}
+.lab-intro > svg {
+  flex: none;
+}
+.lab-intro b {
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+.lab-intro p {
+  font-size: 11px;
+  color: #99aaa0;
+  margin: 7px 0 0;
+}
+.lab-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.lab-nav button {
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 12px 10px;
+  background: #1b2221;
+  border-color: #323d37;
+  font-size: 11px;
+}
+.lab-nav span {
+  font:
+    9px ui-monospace,
+    monospace;
+  color: #6b7c71;
+}
+.lab-nav button.active {
+  color: #f2ca88;
+  background: #343125;
+  border-color: #786344;
+}
+.lab-nav button.active span {
+  color: #b4915f;
+}
+.lab-transport {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #35423c;
+  border-radius: 8px;
+  background: #192521;
+  padding: 14px 17px;
+}
+.lab-transport > div {
+  display: grid;
+  grid-template-columns: 8px 1fr;
+  gap: 7px 9px;
+  align-items: center;
+}
+.lab-transport b {
+  font-size: 12px;
+  font-weight: 500;
+}
+.lab-transport small {
+  grid-column: 2;
+  font-size: 10px;
+  color: #91a294;
+}
+.lab-transport > button {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.lab-play-preferences {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.lab-play-preferences > .field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.lab-play-preferences > .field > span {
+  margin: 0;
+  font-size: 10px;
+}
+.lab-play-preferences input[type="number"] {
+  width: 85px;
+  padding: 8px;
+}
+.lab-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0 0;
+}
+.lab-buttons button,
+.lab-buttons .file-button {
+  font-size: 11px;
+  min-height: 33px;
+}
+.lab-buttons > .muted {
+  margin-left: auto;
+}
+.lab-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 25px 0 15px;
+}
+.lab-tracks > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #354039;
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #17201d;
+}
+.lab-tracks > div > span {
+  font:
+    13px ui-monospace,
+    monospace;
+  color: #d9b87d;
+}
+.lab-tracks > div:nth-child(2) > span {
+  color: #89d5bd;
+}
+.lab-tracks small {
+  font-size: 9px;
+  color: #809a8c;
+  white-space: nowrap;
+}
+.lab-tracks .wave {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+}
+.lab-save-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.lab-save-row input {
+  flex: 1;
+  min-width: 140px;
+  font-size: 12px;
+}
+.lab-save-row button {
+  font-size: 11px;
+}
+.record-clock {
+  font:
+    11px ui-monospace,
+    monospace;
+  color: #88968b;
+}
+.record-clock.active {
+  color: #ff9f97;
+}
+.record-pad {
+  height: 280px;
+  margin-top: 15px;
+}
+.lab-toggles {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.curve-editor {
+  margin: 25px 0;
+  padding: 15px;
+  background: #171e1c;
+  border: 1px solid #354237;
+  border-radius: 8px;
+}
+.curve-editor h3 {
+  font-size: 12px;
+  color: #d7c19a;
+  margin: 0;
+}
+.curve-editor small {
+  font-size: 10px;
+  color: #899b8c;
+}
+.curve-editor > svg {
+  display: block;
+  width: 100%;
+  height: 130px;
+  margin-top: 15px;
+  background: #1d2923;
+  touch-action: none;
+  cursor: crosshair;
+  overflow: visible;
+}
+.curve-editor > svg path {
+  stroke: #4e635333;
+  fill: none;
+}
+.curve-editor > svg polyline {
+  stroke: #f5bd67;
+  stroke-width: 2;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.curve-editor:nth-of-type(2) > svg polyline {
+  stroke: #89d5bd;
+}
+.curve-editor .lab-buttons button {
+  font-size: 10px;
+  min-height: 28px;
+  padding: 6px 8px;
+}
+.curve-editor details {
+  margin-top: 15px;
+  font-size: 10px;
+  color: #829b8b;
+}
+.curve-numbers {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 10px;
+}
+.curve-numbers label {
+  font-size: 9px;
+  color: #7e9587;
+}
+.curve-numbers input {
+  font-size: 10px;
+  padding: 5px;
+}
+.dj-decks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 15px 0 20px;
+}
+.dj-decks > div {
+  padding: 0 15px 18px;
+  border: 1px solid #51432d;
+  background: #29271f;
+  border-radius: 9px;
+  color: #f5bd67;
+}
+.dj-decks > div:nth-child(2) {
+  border-color: #355347;
+  background: #1c2b26;
+  color: #89d5bd;
+}
+.dj-fader {
+  padding: 10px 20px 16px;
+  border: 1px solid #45473a;
+  border-radius: 8px;
+  background: #20251f;
+}
+.dj-fader > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 10px;
+  color: #b4b79b;
+}
+.dj-panel .play-settings > button {
+  align-self: center;
+  margin-top: 15px;
+}
+.laboratory audio {
+  width: 100%;
+  height: 42px;
+  margin: 8px 0;
+}
+.music-meter {
+  height: 40px;
+  background: #131c18;
+  border: 1px solid #3e5746;
+  border-radius: 7px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 20px;
+}
+.music-meter i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #2c6a51, #c4b86a);
+  transition: width 0.1s;
+}
+.music-meter span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: #e5ecdb;
+}
+.music-picks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-height: 200px;
+  overflow: auto;
+  padding: 12px 0;
+}
+.music-picks label {
+  font-size: 10px;
+  white-space: normal;
+}
+.invite-box {
+  padding: 18px;
+  background: #18241f;
+  border: 1px solid #3d5946;
+  border-radius: 8px;
+  margin: 22px 0;
+}
+.invite-box h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  margin: 0;
+}
+.invite-box .play-settings > .field {
+  max-width: 110px;
+}
+.invite-url {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.invite-url input {
+  font-size: 10px;
+  flex: 1;
+  width: 0;
+  color: #aacbb3;
+}
+.invite-url button {
+  font-size: 10px;
+}
+.branch-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+.branch-nodes > details {
+  border: 1px solid #3d4940;
+  border-radius: 8px;
+  background: #19221e;
+  padding: 17px;
+}
+.branch-nodes summary > b {
+  font-size: 12px;
+  font-weight: 500;
+}
+.branch-nodes summary > span {
+  font:
+    10px ui-monospace,
+    monospace;
+  color: #91a98f;
+}
+.branch-edge {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 9px 0;
+}
+.branch-edge input {
+  flex: 1;
+  width: 0;
+  font-size: 11px;
+}
+.branch-edge select {
+  width: 115px;
+  font-size: 11px;
+}
+.branch-edge > span {
+  color: #718c79;
+}
+.branch-edge button {
+  padding: 5px 10px;
+}
+.branch-choice {
+  padding: 24px;
+  background: linear-gradient(120deg, #323021, #26352b);
+  border: 1px solid #8a7d4b;
+  border-radius: 8px;
+  margin: 24px 0;
+}
+.branch-choice h3 {
+  font-size: 17px;
+}
+.branch-choice .eyebrow {
+  color: #bcb47c;
+}
+.clip-library > .section-heading > .lab-buttons {
+  margin: 0;
+}
+.clip-library > details {
+  padding: 16px 0;
+  border-top: 1px solid #334139;
+  margin-top: 18px;
+}
+.clip-library summary b {
+  font-size: 12px;
+  font-weight: 500;
+}
+.clip-library summary span {
+  font-size: 10px;
+  color: #8a9d8b;
+}
+.guest-shell {
+  min-height: 100vh;
+  max-width: 620px;
+  padding: 50px 22px;
+  margin: 0 auto;
+}
+.guest-shell > .brand {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  color: #b6d9bc;
+  margin: 0 0 35px;
+}
+.guest-shell > .brand > span:last-child {
+  display: block;
+}
+.guest-shell > .brand small {
+  letter-spacing: 1.7px;
+}
+.guest-shell > .panel {
+  padding: 30px;
+  background: linear-gradient(130deg, #202922, #19221f);
+  border-color: #405442;
+}
+.guest-shell h1 {
+  font-size: 25px;
+  margin: 12px 0 22px;
+  line-height: 1.5;
+}
+.guest-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 25px 0;
+  font-size: 11px;
+  color: #adc2ac;
+}
+.guest-status > span:last-child {
+  margin-left: auto;
+  color: #8caa91;
+}
+.guest-shell .field {
+  margin: 26px 0;
+}
+.guest-wave {
+  border: 1px solid #364e3b;
+  border-radius: 8px;
+  padding: 0 16px 12px;
+}
+.guest-wave .wave.large {
+  height: 90px;
+}
+.guest-shell .banner {
+  font-size: 11px;
+  padding: 10px 14px;
+  border-radius: 5px;
+}
+.inline-error {
+  font-size: 12px;
+  color: #ffc5b8;
+  border: 1px solid #8c514c;
+  background: #402a28;
+  border-radius: 6px;
+  padding: 13px;
+  margin-top: 18px;
+}
+@media (max-width: 760px) {
+  .lab-nav {
+    gap: 6px;
+  }
+  .lab-nav button {
+    font-size: 10px;
+    padding: 11px 7px;
+    gap: 5px;
+  }
+  .lab-nav span {
+    font-size: 8px;
+  }
+  .lab-intro {
+    padding: 17px;
+    gap: 11px;
+  }
+  .lab-intro b {
+    font-size: 13px;
+  }
+  .lab-intro p {
+    font-size: 10px;
+  }
+  .lab-transport {
+    padding: 12px;
+    gap: 8px;
+  }
+  .lab-transport b {
+    font-size: 11px;
+  }
+  .lab-transport small {
+    font-size: 9px;
+    line-height: 1.7;
+  }
+  .lab-transport > button {
+    font-size: 10px;
+    padding: 7px 9px;
+  }
+  .lab-play-preferences {
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .lab-play-preferences > .field {
+    gap: 7px;
+  }
+  .lab-play-preferences > .field > span {
+    font-size: 9px;
+  }
+  .lab-play-preferences input[type="number"] {
+    width: 68px;
+  }
+  .lab-save-row {
+    gap: 8px;
+  }
+  .lab-save-row input {
+    flex-basis: 100%;
+  }
+  .lab-save-row > button {
+    flex: 1;
+  }
+  .lab-tracks > div {
+    gap: 8px;
+    padding: 8px;
+  }
+  .record-pad .pad-center strong {
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .record-pad {
+    height: 290px;
+  }
+  .curve-editor {
+    padding: 12px;
+  }
+  .curve-numbers {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .dj-decks {
+    gap: 12px;
+  }
+  .dj-decks > div {
+    padding: 0 10px 12px;
+  }
+  .dj-decks select {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .music-picks {
+    grid-template-columns: 1fr 1fr;
+  }
+  .invite-box {
+    padding: 14px;
+  }
+  .invite-box > .section-heading {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .invite-box .play-settings > .field {
+    max-width: 90px;
+  }
+  .invite-box .lab-buttons {
+    gap: 7px;
+  }
+  .invite-box .lab-buttons button {
+    font-size: 10px;
+  }
+  .branch-nodes > details {
+    padding: 12px;
+  }
+  .branch-nodes summary > b {
+    font-size: 11px;
+    max-width: 85%;
+    line-height: 1.7;
+  }
+  .branch-edge {
+    gap: 6px;
+  }
+  .branch-edge input {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .branch-edge select {
+    width: 88px;
+    font-size: 10px;
+    padding: 8px;
+  }
+  .branch-choice {
+    padding: 18px;
+  }
+  .branch-choice h3 {
+    font-size: 15px;
+  }
+  .clip-library > .section-heading {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .guest-shell {
+    padding: 30px 17px;
+  }
+  .guest-shell > .panel {
+    padding: 23px;
+  }
+  .guest-shell h1 {
+    font-size: 23px;
+  }
+  .sidebar nav button {
+    font-size: 8px;
+  }
+}

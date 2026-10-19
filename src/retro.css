@@ -1,0 +1,1438 @@
+/* A third faceplate. Existing themes keep their original layout. */
+.retro-wordmark,
+.analog-meter {
+  display: none;
+}
+.instrument-readout {
+  display: contents;
+}
+.theme-retro .theme-swatch {
+  background: #f4ecda;
+  color: #ad4926;
+  border-color: #b7ab91;
+  border-radius: 4px;
+  box-shadow: inset 0 -4px #d8cfbc;
+}
+.theme-menu {
+  max-height: calc(100dvh - 96px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* STEREO — warm enamel, printed scales, copper and forest-green channels. */
+:root[data-theme="retro"] {
+  --bg: #e7dfcf;
+  --panel: #f6f0e4;
+  --line: #bcb8a8;
+  --muted: #626459;
+  --accent: #ad4926;
+  --mint: #306b64;
+  --red: #a63e32;
+  --text: #2d342e;
+  color: #2d342e;
+  background: var(--bg);
+  color-scheme: light;
+  font-family: "Helvetica Neue", "Noto Sans CJK SC", "PingFang SC", sans-serif;
+}
+:root[data-theme="retro"] body {
+  background:
+    radial-gradient(#786c4718 0.6px, transparent 0.6px) 0 0 / 5px 5px,
+    var(--bg);
+}
+:root[data-theme="retro"] button {
+  color: #364039;
+  background: linear-gradient(#fffaf0, #e9e1d1);
+  border: 1px solid #aba997;
+  border-radius: 6px;
+  box-shadow:
+    0 3px 0 #beb6a3,
+    inset 0 1px #fffdf8;
+}
+:root[data-theme="retro"] button:hover:not(:disabled) {
+  background: #fff9eb;
+  border-color: #6c7568;
+}
+:root[data-theme="retro"] button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #beb6a3;
+}
+:root[data-theme="retro"] button:disabled {
+  opacity: 0.45;
+}
+:root[data-theme="retro"] button:focus-visible,
+:root[data-theme="retro"] a:focus-visible,
+:root[data-theme="retro"] summary:focus-visible {
+  outline: 2px solid #306b64;
+  outline-offset: 4px;
+}
+:root[data-theme="retro"] input,
+:root[data-theme="retro"] select,
+:root[data-theme="retro"] textarea {
+  color: #2d342e;
+  background: #fffaf0;
+  border-color: #a6ab99;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 3px #6157350a;
+}
+:root[data-theme="retro"] input:focus,
+:root[data-theme="retro"] select:focus,
+:root[data-theme="retro"] textarea:focus {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 2px #306b6422;
+}
+:root[data-theme="retro"] input::placeholder,
+:root[data-theme="retro"] textarea::placeholder {
+  color: #707366;
+}
+:root[data-theme="retro"] input[type="range"] {
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .primary {
+  color: #fffaf1;
+  background: #ad4926;
+  border-color: #8c3a1e;
+  box-shadow:
+    0 4px 0 #78371e,
+    inset 0 1px #d57d56;
+  font-weight: 700;
+}
+:root[data-theme="retro"] .primary:hover:not(:disabled) {
+  background: #963c20;
+  border-color: #78371e;
+  color: #fff;
+}
+:root[data-theme="retro"] .primary:active:not(:disabled) {
+  box-shadow: 0 1px 0 #78371e;
+}
+:root[data-theme="retro"] .danger {
+  background: #f4ded2;
+  color: #922f27;
+  border-color: #bf806d;
+  box-shadow: 0 3px #d1ac96;
+}
+:root[data-theme="retro"] .danger:hover:not(:disabled) {
+  background: #edc7b9;
+  border-color: #953e30;
+}
+:root[data-theme="retro"] .subtle,
+:root[data-theme="retro"] .icon-button,
+:root[data-theme="retro"] .account {
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .subtle:hover:not(:disabled),
+:root[data-theme="retro"] .account:hover:not(:disabled) {
+  color: var(--accent);
+  background: transparent;
+  border-color: transparent;
+}
+:root[data-theme="retro"] .muted,
+:root[data-theme="retro"] .hint,
+:root[data-theme="retro"] .field,
+:root[data-theme="retro"] .switch-label,
+:root[data-theme="retro"] h4 {
+  color: var(--muted);
+}
+:root[data-theme="retro"] .hint {
+  font-size: 12px;
+}
+:root[data-theme="retro"] .field small {
+  color: #666c5e;
+}
+:root[data-theme="retro"] .field > span {
+  font-size: 12px;
+}
+:root[data-theme="retro"] .sidebar {
+  background: linear-gradient(
+    90deg,
+    #d8d0bc,
+    #e4dccb 12%,
+    #e4dccb 90%,
+    #d0c9b6
+  );
+  border-right: 1px solid #aaa68f;
+  padding-top: 27px;
+}
+:root[data-theme="retro"] .sidebar .brand {
+  font-size: 17px;
+  letter-spacing: 2px;
+}
+:root[data-theme="retro"] .sidebar .brand small {
+  display: none;
+}
+:root[data-theme="retro"] .sidebar .brand-icon {
+  color: var(--accent);
+}
+:root[data-theme="retro"] .retro-wordmark {
+  display: block;
+  padding: 24px 8px 0;
+}
+:root[data-theme="retro"] .retro-wordmark small {
+  display: block;
+  color: #686954;
+  font:
+    9px ui-monospace,
+    monospace;
+  letter-spacing: 1px;
+}
+:root[data-theme="retro"] .retro-wordmark b {
+  display: block;
+  color: #303d31;
+  font:
+    italic 700 28px/1.12 Georgia,
+    "Noto Serif CJK SC",
+    serif;
+  letter-spacing: -1px;
+  margin: 16px 0 18px;
+}
+:root[data-theme="retro"] .retro-wordmark > span {
+  display: block;
+  color: #6a705e;
+  font:
+    9px ui-monospace,
+    monospace;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+:root[data-theme="retro"] .speaker-grille {
+  height: 24px;
+  border-radius: 4px;
+  background: radial-gradient(#827d68 1.2px, transparent 1.7px) 0 0 / 5px 5px;
+  opacity: 0.75;
+}
+:root[data-theme="retro"] .nav-caption {
+  color: #686e60;
+  margin-top: 27px;
+}
+:root[data-theme="retro"] .sidebar nav {
+  gap: 11px;
+}
+:root[data-theme="retro"] .sidebar nav button {
+  color: #4f594b;
+  background: #ece5d5;
+  border: 1px solid #b4b19e;
+  height: 47px;
+  box-shadow: 0 3px 0 #c0b9a4;
+  border-radius: 5px;
+}
+:root[data-theme="retro"] .sidebar nav button.active {
+  color: #fff9e8;
+  background: #3f5847;
+  border-color: #314737;
+  box-shadow: 0 3px 0 #263e2f;
+}
+:root[data-theme="retro"] .sidebar nav button.active .nav-dot {
+  background: #ecd082;
+  box-shadow: 0 0 5px #f0cf6b66;
+}
+:root[data-theme="retro"] .sidebar nav button:not(.active):hover {
+  background: #fff7e8;
+  color: #263d2b;
+}
+:root[data-theme="retro"] .sidebar-bottom {
+  border-top: 1px solid #b4b29c;
+  padding-top: 20px;
+}
+:root[data-theme="retro"] .sidebar-bottom p,
+:root[data-theme="retro"] .version,
+:root[data-theme="retro"] .system-label {
+  color: #5c6655;
+}
+:root[data-theme="retro"] .topbar {
+  background: #f0e9da;
+  border-color: #b7b4a1;
+  height: 64px;
+}
+:root[data-theme="retro"] .breadcrumb {
+  color: #646b5e;
+}
+:root[data-theme="retro"] .breadcrumb b {
+  color: #334638;
+}
+:root[data-theme="retro"] .top-actions {
+  gap: 18px;
+}
+:root[data-theme="retro"] .connection-pill {
+  color: #60695c;
+}
+:root[data-theme="retro"] .connection-pill.live {
+  color: #306b64;
+}
+:root[data-theme="retro"] .status-dot {
+  background: #8e9788;
+}
+:root[data-theme="retro"] .status-dot.green,
+:root[data-theme="retro"] .live .status-dot {
+  background: #447653;
+  box-shadow: 0 0 0 2px #d0dcc6;
+}
+:root[data-theme="retro"] .theme-trigger {
+  background: #f9f2e4;
+  color: #3d5140;
+  border-color: #b2b49e;
+  box-shadow: 0 2px #c5bfa8;
+}
+:root[data-theme="retro"] .theme-menu {
+  color: #293c30;
+  background: #f5eddf;
+  border-color: #a9ae98;
+  box-shadow: 0 10px 30px #4f4b3330;
+  border-radius: 8px;
+}
+:root[data-theme="retro"] .theme-menu > p {
+  color: #616954;
+}
+:root[data-theme="retro"] .theme-menu .theme-option {
+  background: #fff9ed;
+  color: #2d3c30;
+  border-color: #c1bea9;
+  box-shadow: 0 2px #d6cbb7;
+}
+:root[data-theme="retro"] .theme-menu .theme-option[aria-pressed="true"] {
+  border: 2px solid #ad4926;
+  padding: 11px;
+}
+:root[data-theme="retro"] .theme-option small {
+  color: #626a5b;
+}
+:root[data-theme="retro"] .theme-menu .theme-option:hover {
+  background: #e9ecd9;
+}
+:root[data-theme="retro"] .banner {
+  color: #585738;
+  background: #e2d9b4;
+  border-color: #b9ae80;
+  font-size: 11px;
+}
+:root[data-theme="retro"] .banner button {
+  color: #655834;
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .banner.error {
+  background: #f0d4c9;
+  color: #8c312b;
+  border-color: #bd8675;
+}
+:root[data-theme="retro"] main {
+  padding-top: 28px;
+}
+:root[data-theme="retro"] .page-heading {
+  padding-bottom: 23px;
+  margin-bottom: 23px;
+  border-bottom: 3px double #a2a48f;
+}
+:root[data-theme="retro"] .page-heading h1 {
+  color: #263c30;
+  font:
+    700 36px/1.3 "Noto Serif CJK SC",
+    "Songti SC",
+    Georgia,
+    serif;
+  margin: 8px 0 12px;
+  letter-spacing: -1px;
+}
+:root[data-theme="retro"] .page-heading .muted {
+  color: #626a5b;
+  font-size: 13px;
+}
+:root[data-theme="retro"] .eyebrow {
+  color: #8e492d;
+  font:
+    10px ui-monospace,
+    monospace;
+  letter-spacing: 1.6px;
+}
+:root[data-theme="retro"] .deck-signature {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex: none;
+}
+:root[data-theme="retro"] .deck-signature > span {
+  color: #676f5d;
+  font:
+    9px/1.9 ui-monospace,
+    monospace;
+  letter-spacing: 0.7px;
+  text-align: right;
+}
+:root[data-theme="retro"] .deck-signature strong {
+  font:
+    italic 700 65px/0.9 Georgia,
+    serif;
+  color: #3d5241;
+}
+:root[data-theme="retro"] .deck-signature strong > span {
+  color: #b65a37;
+  font-size: 30px;
+  vertical-align: top;
+  margin-left: 4px;
+}
+:root[data-theme="retro"] .signature-stripes {
+  height: 52px;
+  width: 14px;
+  border-radius: 2px;
+  background: linear-gradient(#bc5d37 0 33%, #b8a36a 33% 66%, #406e60 66%);
+}
+:root[data-theme="retro"] .feature-nav {
+  gap: 8px;
+  padding: 0;
+  margin-bottom: 25px;
+}
+:root[data-theme="retro"] .feature-nav button {
+  color: #58634f;
+  background: #efe9d8;
+  border-color: #b5b79d;
+  min-height: 44px;
+  padding: 10px 17px;
+}
+:root[data-theme="retro"] .feature-nav button.active {
+  background: #3f5847;
+  color: #fffaee;
+  border-color: #2b4132;
+  box-shadow: 0 3px #283d2d;
+}
+:root[data-theme="retro"] .feature-nav button:not(.active):hover {
+  background: #fff9eb;
+}
+:root[data-theme="retro"] .panel {
+  background: #f5efe1;
+  border-color: #b9b9a1;
+  border-radius: 9px;
+  box-shadow:
+    0 3px 8px #574e3110,
+    inset 0 1px #fffdf4;
+}
+:root[data-theme="retro"] .section-heading h2 {
+  color: #344934;
+  font-weight: 700;
+  font-size: 15px;
+}
+:root[data-theme="retro"] .section-tag {
+  color: #65704e;
+  border-color: #b1b58f;
+  background: #e8e8cf;
+  border-radius: 2px;
+}
+:root[data-theme="retro"] .device-strip {
+  background: #dedfcd;
+  border: 1px solid #a7af95;
+  border-radius: 5px;
+  padding: 13px 17px;
+  box-shadow: inset 0 1px #f8f6e6;
+}
+:root[data-theme="retro"] .device-symbol {
+  background: #f1eddc;
+  color: #4a6752;
+  border-color: #a7b096;
+  border-radius: 4px;
+}
+:root[data-theme="retro"] .device-details b {
+  color: #354836;
+}
+:root[data-theme="retro"] .device-details span {
+  color: #606b57;
+  margin-top: 5px;
+}
+:root[data-theme="retro"] .channel-card {
+  border: 1px solid #a7a892;
+  border-top: 5px solid var(--channel);
+  border-radius: 7px;
+  padding: 23px;
+  background: linear-gradient(#f8f2e5, #eae5d4);
+  box-shadow:
+    0 4px 0 #ccc3ad,
+    inset 0 0 0 3px #fdf8ec;
+}
+:root[data-theme="retro"] .channel-card.mint {
+  border-top-color: var(--mint);
+}
+:root[data-theme="retro"] .channel-badge {
+  border-radius: 50%;
+  color: #fcf7e9;
+  background: var(--channel);
+  border: 2px solid color-mix(in srgb, var(--channel) 70%, #fff);
+  width: 36px;
+  height: 36px;
+  font:
+    700 18px Georgia,
+    serif;
+  box-shadow: 0 2px 1px #8b816d;
+}
+:root[data-theme="retro"] .channel-top h3 {
+  color: #344934;
+  font-size: 13px;
+}
+:root[data-theme="retro"]
+  .channel-top
+  span:not(.channel-badge):not(.status-dot) {
+  color: #626c5c;
+  font-size: 10px;
+}
+:root[data-theme="retro"] .instrument-readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  gap: 14px;
+  align-items: center;
+  margin: 23px 0;
+}
+:root[data-theme="retro"] .analog-meter {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: #58604e;
+  background: linear-gradient(#eee0bd, #faf0d5);
+  border: 1px solid #aaa88b;
+  border-radius: 40% 40% 5px 5px / 16% 16% 5px 5px;
+  box-shadow: inset 0 2px 5px #5e573830;
+}
+:root[data-theme="retro"] .analog-meter text {
+  fill: #59604c;
+  font:
+    11px ui-monospace,
+    monospace;
+  text-anchor: middle;
+}
+:root[data-theme="retro"] .analog-meter .meter-legend {
+  font-size: 10px;
+  letter-spacing: 2px;
+  fill: #777759;
+}
+:root[data-theme="retro"] .meter-arc {
+  stroke: #68705b;
+  fill: none;
+  stroke-width: 1;
+}
+:root[data-theme="retro"] .meter-tick {
+  stroke: #5a644f;
+  stroke-width: 1.5;
+}
+:root[data-theme="retro"] .meter-tick.hot {
+  stroke: #ad4926;
+}
+:root[data-theme="retro"] .meter-needle {
+  stroke: var(--channel);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+:root[data-theme="retro"] .meter-pivot {
+  fill: #505c45;
+  stroke: #faf4da;
+  stroke-width: 2;
+}
+:root[data-theme="retro"] .channel-card .intensity {
+  display: block;
+  margin: 0;
+}
+:root[data-theme="retro"] .channel-card .intensity strong {
+  font:
+    600 48px/1 ui-monospace,
+    monospace;
+  letter-spacing: -3px;
+  color: var(--channel);
+}
+:root[data-theme="retro"] .intensity > div {
+  font-size: 11px;
+  color: #57624e;
+  margin-top: 11px;
+}
+:root[data-theme="retro"] .intensity small {
+  font-size: 10px;
+  color: #626c59;
+  margin-top: 6px;
+}
+:root[data-theme="retro"] .intensity-meter,
+:root[data-theme="retro"] .meter-scale {
+  display: none;
+}
+:root[data-theme="retro"] .steps button {
+  min-height: 44px;
+  width: 44px;
+  color: var(--channel);
+  border-color: #a6ab91;
+  background: linear-gradient(#fffaec, #e0dcc7);
+}
+:root[data-theme="retro"] .steps select {
+  background: #e0e3ce;
+  color: #46503a;
+  border-color: #abb496;
+  font:
+    12px ui-monospace,
+    monospace;
+}
+:root[data-theme="retro"] .set-target input {
+  background: #e2e4cb;
+  color: #465239;
+  font:
+    14px ui-monospace,
+    monospace;
+  min-height: 40px;
+}
+:root[data-theme="retro"] .channel-card .button-row button {
+  background: linear-gradient(#f8f2e2, #e4dfcc);
+  color: #54614c;
+}
+:root[data-theme="retro"] .channel-card details {
+  border-color: #bbbda7;
+}
+:root[data-theme="retro"] .channel-card summary {
+  color: #656b53;
+}
+:root[data-theme="retro"] .readouts,
+:root[data-theme="retro"] dt {
+  color: #626a59;
+}
+:root[data-theme="retro"] .readouts b,
+:root[data-theme="retro"] dd {
+  color: #304631;
+}
+:root[data-theme="retro"] .quick-wave {
+  color: var(--accent);
+  background: #efe7d2;
+  border-color: #c5b898;
+  border-radius: 5px;
+}
+:root[data-theme="retro"] .quick-wave:nth-child(2) {
+  color: var(--mint);
+}
+:root[data-theme="retro"] .quick-wave:nth-child(3) {
+  color: #7b6556;
+}
+:root[data-theme="retro"] .quick-wave > span {
+  color: #4d5946;
+}
+:root[data-theme="retro"] .wave-grid {
+  stroke: #55634822;
+}
+:root[data-theme="retro"] .feedback button {
+  color: #59634f;
+  background: #ede7d8;
+  border-color: #bcbba3;
+  min-height: 38px;
+}
+:root[data-theme="retro"] .right-rail .panel {
+  background: #eeeadb;
+}
+:root[data-theme="retro"] .room-code {
+  font:
+    700 27px ui-monospace,
+    monospace;
+  color: var(--accent);
+}
+:root[data-theme="retro"] .connection-summary,
+:root[data-theme="retro"] .room-owner {
+  color: #5b6755;
+}
+:root[data-theme="retro"] .playback > .section-heading,
+:root[data-theme="retro"] .playback-item b {
+  color: #445940;
+}
+:root[data-theme="retro"] .playback-item small {
+  color: #66725e;
+}
+:root[data-theme="retro"] .channel-letter {
+  color: var(--channel);
+  background: #dfe3cb;
+  border: 1px solid #bbc0a2;
+  border-radius: 3px;
+}
+:root[data-theme="retro"] .note {
+  color: #5b7253;
+}
+:root[data-theme="retro"] .note b {
+  color: #48613f;
+}
+:root[data-theme="retro"] .note p,
+:root[data-theme="retro"] .rail-caption,
+:root[data-theme="retro"] .rail-caption span {
+  color: #626e58;
+}
+:root[data-theme="retro"] footer {
+  border-color: #aeb29b;
+  color: #626b55;
+}
+:root[data-theme="retro"] .wave-tile {
+  color: #727653;
+  background: #efead6;
+  border-color: #c0bca1;
+  border-radius: 4px;
+}
+:root[data-theme="retro"] .wave-tile b {
+  color: #4d5e40;
+}
+:root[data-theme="retro"] .wave-tile span {
+  color: #6c735a;
+}
+:root[data-theme="retro"] .wave-tile.selected {
+  background: #e7d0ab;
+  color: var(--accent);
+  border-color: #b67b51;
+}
+:root[data-theme="retro"] .wave-tile.selected b {
+  color: #8b492d;
+}
+:root[data-theme="retro"] .waveform-detail .eyebrow,
+:root[data-theme="retro"] .wave-detail-footer {
+  color: #6c7257;
+}
+:root[data-theme="retro"] .count {
+  color: #5b664c;
+  background: #dee2c9;
+}
+:root[data-theme="retro"] .file-button {
+  color: #58654d;
+  background: #eae6d4;
+  border-color: #b4b79b;
+}
+:root[data-theme="retro"] .queue-row {
+  border-color: #b7b99d;
+}
+:root[data-theme="retro"] .queue-row > b {
+  color: #3d5135;
+}
+:root[data-theme="retro"] .queue-row small,
+:root[data-theme="retro"] .row-index {
+  color: #697356;
+}
+:root[data-theme="retro"] .empty-state {
+  color: #616d54;
+}
+:root[data-theme="retro"] .empty-state svg,
+:root[data-theme="retro"] .empty-state span {
+  color: #66765a;
+}
+:root[data-theme="retro"] .scene-card {
+  color: #486543;
+  background: linear-gradient(135deg, #d9e0c5, #e9e8d5);
+  border-color: #9eaf8c;
+  border-radius: 6px;
+}
+:root[data-theme="retro"] .scene-card:nth-child(2) {
+  color: #7a572d;
+  background: linear-gradient(135deg, #e9d6af, #f2e7ce);
+  border-color: #baa174;
+}
+:root[data-theme="retro"] .scene-card.random {
+  color: #775b53;
+  background: linear-gradient(135deg, #e0d2c9, #ede5d7);
+  border-color: #b8a496;
+}
+:root[data-theme="retro"] .log-row {
+  color: #45563a;
+  border-color: #b6bba0;
+}
+:root[data-theme="retro"] .log-row time {
+  color: #6b755b;
+}
+:root[data-theme="retro"] .log-row.error,
+:root[data-theme="retro"] .log-row.stop {
+  color: #993e2e;
+}
+:root[data-theme="retro"] .segmented {
+  background: #dddcc5;
+  border-color: #adb493;
+  border-radius: 6px;
+}
+:root[data-theme="retro"] .segmented button {
+  background: transparent;
+  color: #5e6b4e;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .segmented button.active {
+  color: #fff9e8;
+  background: #52664b;
+  box-shadow: 0 2px #384b32;
+}
+:root[data-theme="retro"] .touchpad,
+:root[data-theme="retro"] .record-pad {
+  border-radius: 8px;
+  border: 1px solid #8f9b7b;
+  background:
+    linear-gradient(#67785818 1px, transparent 1px),
+    linear-gradient(90deg, #67785818 1px, transparent 1px), #e1e5cc;
+  background-size: 25px 25px;
+  box-shadow: inset 0 2px 8px #5968481c;
+}
+:root[data-theme="retro"] .pad-grid {
+  background-image:
+    linear-gradient(#596a461a 1px, transparent 1px),
+    linear-gradient(90deg, #596a461a 1px, transparent 1px);
+}
+:root[data-theme="retro"] .pad-center > svg,
+:root[data-theme="retro"] .pad-center strong {
+  color: #4b6543;
+}
+:root[data-theme="retro"] .pad-center > span,
+:root[data-theme="retro"] .pad-top,
+:root[data-theme="retro"] .pad-bottom {
+  color: #5b6c4d;
+}
+:root[data-theme="retro"] .touch-cursor {
+  color: #fff8e8;
+  background: var(--channel);
+  border-color: #fffcf0;
+  box-shadow:
+    0 0 0 7px #fff8e850,
+    0 3px 8px #61583b55;
+}
+:root[data-theme="retro"] .rhythm-grid {
+  background: #9daa82;
+}
+:root[data-theme="retro"] .rhythm-grid > div {
+  background: #d5dfbc;
+}
+:root[data-theme="retro"] .rhythm-grid > div:nth-child(3n) {
+  background: #e7d8b9;
+}
+:root[data-theme="retro"] .rhythm-grid b {
+  color: #4a603c;
+}
+:root[data-theme="retro"] .rhythm-grid span {
+  color: #6c7a58;
+}
+:root[data-theme="retro"] .touch-panel details {
+  border-color: #b6bba1;
+  color: #59684b;
+}
+:root[data-theme="retro"] .axis-row {
+  color: #5b6b4b;
+}
+:root[data-theme="retro"] .fire-controls {
+  gap: 22px;
+  padding: 12px 5px;
+}
+:root[data-theme="retro"] .fire-button {
+  border-radius: 50%;
+  max-width: 165px;
+  aspect-ratio: 1;
+  min-height: 130px;
+  color: #fff8e8;
+  border: 7px solid #d3ceb7;
+  outline: 1px solid #a5aa91;
+  background: radial-gradient(
+    circle at 38% 30%,
+    color-mix(in srgb, var(--channel) 75%, white),
+    var(--channel) 65%
+  );
+  box-shadow:
+    0 6px 0 #959b80,
+    inset 0 1px 3px #ffffff77;
+}
+:root[data-theme="retro"] .fire-button > strong {
+  font:
+    600 37px ui-monospace,
+    monospace;
+}
+:root[data-theme="retro"] .fire-button > span {
+  color: #fff8e8;
+  font-size: 10px;
+}
+:root[data-theme="retro"] .fire-button.firing,
+:root[data-theme="retro"] .fire-button:active:not(:disabled) {
+  transform: translateY(4px);
+  background: var(--channel);
+  box-shadow:
+    0 2px 0 #959b80,
+    inset 0 3px 8px #273a3822;
+}
+:root[data-theme="retro"] .lab-transport {
+  background: #e0e6cf;
+  border-color: #a3b393;
+  border-left: 4px solid #507653;
+  border-radius: 5px;
+}
+:root[data-theme="retro"] .lab-transport b {
+  color: #3f5d3d;
+}
+:root[data-theme="retro"] .lab-transport small {
+  color: #596d4e;
+}
+:root[data-theme="retro"] .lab-tracks > div,
+:root[data-theme="retro"] .curve-editor,
+:root[data-theme="retro"] .dj-decks > div,
+:root[data-theme="retro"] .invite-box,
+:root[data-theme="retro"] .branch-nodes > details,
+:root[data-theme="retro"] .guest-wave {
+  color: #5d6c4e;
+  background: #e9ebd7;
+  border-color: #adb698;
+  border-radius: 5px;
+}
+:root[data-theme="retro"] .lab-tracks > div > span {
+  color: var(--accent);
+}
+:root[data-theme="retro"] .lab-tracks > div:nth-child(2) > span {
+  color: var(--mint);
+}
+:root[data-theme="retro"] .lab-tracks small,
+:root[data-theme="retro"] .curve-editor small,
+:root[data-theme="retro"] .curve-numbers label,
+:root[data-theme="retro"] .record-clock {
+  color: #647256;
+}
+:root[data-theme="retro"] .record-clock.active {
+  color: #a63e32;
+}
+:root[data-theme="retro"] .curve-editor h3 {
+  color: #576945;
+}
+:root[data-theme="retro"] .curve-editor > svg {
+  background: #f5f2df;
+}
+:root[data-theme="retro"] .curve-editor > svg path {
+  stroke: #6e7e552e;
+}
+:root[data-theme="retro"] .curve-editor > svg polyline {
+  stroke: var(--accent);
+}
+:root[data-theme="retro"] .curve-editor:nth-of-type(2) > svg polyline {
+  stroke: var(--mint);
+}
+:root[data-theme="retro"] .curve-editor details {
+  border-color: #b9bea3;
+  color: #5c6e50;
+}
+:root[data-theme="retro"] .dj-decks > div {
+  color: var(--accent);
+}
+:root[data-theme="retro"] .dj-decks > div:nth-child(2) {
+  color: var(--mint);
+}
+:root[data-theme="retro"] .dj-fader {
+  color: #546b43;
+  background: #e2e5ce;
+  border-color: #aeb995;
+  border-radius: 5px;
+}
+:root[data-theme="retro"] .dj-fader > div {
+  color: #5c6e50;
+}
+:root[data-theme="retro"] .music-meter {
+  background: #dde4c9;
+  border-color: #9fac8a;
+}
+:root[data-theme="retro"] .music-meter i {
+  background: #639467;
+}
+:root[data-theme="retro"] .music-meter span,
+:root[data-theme="retro"] .music-picks label {
+  color: #4a653d;
+}
+:root[data-theme="retro"] .invite-box h3,
+:root[data-theme="retro"] .invite-url input {
+  color: #3f693e;
+}
+:root[data-theme="retro"] .branch-choice {
+  background: #f0e0bd;
+  color: #6f592f;
+  border-color: #b6a076;
+  border-radius: 6px;
+}
+:root[data-theme="retro"] .branch-choice .eyebrow {
+  color: #8d5b30;
+}
+:root[data-theme="retro"] .branch-nodes summary > span,
+:root[data-theme="retro"] .branch-edge > span,
+:root[data-theme="retro"] .clip-library summary span {
+  color: #637651;
+}
+:root[data-theme="retro"] .clip-library > details {
+  border-color: #b1bb99;
+}
+:root[data-theme="retro"] .connection-guide {
+  background: #edf0dd;
+  color: #3a5735;
+  border-color: #a0b28c;
+  border-left: 5px solid #486e4c;
+  border-radius: 7px;
+}
+:root[data-theme="retro"] .connection-guide > svg {
+  color: #50754a;
+}
+:root[data-theme="retro"] .connection-guide p {
+  color: #5b6f50;
+}
+:root[data-theme="retro"] .control-dock {
+  background: #e9e2d2f7;
+  border-top: 3px double #9ba58d;
+  box-shadow: 0 -6px 22px #4d54331a;
+}
+:root[data-theme="retro"] .control-dock b {
+  color: #3d5137;
+}
+:root[data-theme="retro"] .control-dock b span {
+  color: #8f4022;
+  font-family: ui-monospace, monospace;
+}
+:root[data-theme="retro"] .control-dock small {
+  color: #606e51;
+}
+:root[data-theme="retro"] .control-dock .danger {
+  background: #a63e32;
+  color: #fff4e9;
+  border-color: #7e3029;
+  box-shadow:
+    0 4px 0 #78332d,
+    inset 0 1px #d1826c;
+  border-radius: 5px;
+  font-weight: 700;
+}
+:root[data-theme="retro"] .control-dock .danger:hover:not(:disabled) {
+  background: #8d3027;
+}
+:root[data-theme="retro"] .toast {
+  color: #304f30;
+  background: #e0ebd4;
+  border-color: #809e6b;
+  box-shadow: 0 5px 25px #54623d30;
+}
+:root[data-theme="retro"] .toast.error,
+:root[data-theme="retro"] .inline-error {
+  color: #89362d;
+  background: #f6dfd3;
+  border-color: #b9816c;
+}
+:root[data-theme="retro"] .toast button {
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="retro"] hr {
+  border-color: #afb59c;
+}
+/* Management and invitation pages share the same light enclosure. */
+:root[data-theme="retro"] .admin-shell {
+  color: #30472f;
+  background:
+    radial-gradient(#786c4718 0.6px, transparent 0.6px) 0 0 / 5px 5px,
+    #e7dfcf;
+}
+:root[data-theme="retro"] .admin-header {
+  border-color: #aeb39c;
+}
+:root[data-theme="retro"] .admin-brand {
+  color: #a64b27;
+}
+:root[data-theme="retro"] .admin-brand small,
+:root[data-theme="retro"] .admin-back {
+  color: #596b4e;
+}
+:root[data-theme="retro"] .admin-shell h1,
+:root[data-theme="retro"] .guest-shell h1 {
+  color: #344d32;
+  font-family: "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+  font-weight: 700;
+}
+:root[data-theme="retro"] .admin-gate {
+  background: #f2eddd;
+  border: 1px solid #aaa98d;
+  border-top: 5px solid #637653;
+  border-radius: 10px;
+  box-shadow:
+    0 5px 0 #c6bea5,
+    0 12px 30px #6c66451a;
+}
+:root[data-theme="retro"] .admin-gate-icon {
+  color: #f9f3df;
+  background: #577550;
+  border: 3px solid #d3d8bc;
+  border-radius: 50%;
+}
+:root[data-theme="retro"] .admin-gate .eyebrow,
+:root[data-theme="retro"] .admin-title .eyebrow {
+  color: #8c5431;
+}
+:root[data-theme="retro"] .admin-lead,
+:root[data-theme="retro"] .admin-shell .muted,
+:root[data-theme="retro"] .admin-shell .hint,
+:root[data-theme="retro"] .admin-footnote,
+:root[data-theme="retro"] .admin-session,
+:root[data-theme="retro"] .admin-empty,
+:root[data-theme="retro"] .admin-device small,
+:root[data-theme="retro"] .admin-loading {
+  color: #5e6a50;
+}
+:root[data-theme="retro"] .admin-password button {
+  color: #536b48;
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .admin-gate-footer {
+  color: #5b6b4d;
+  border-color: #b3ba9c;
+}
+:root[data-theme="retro"] .admin-session > span:first-child {
+  color: #38663c;
+}
+:root[data-theme="retro"] .admin-message {
+  background: #e0e8cf;
+  color: #3d6339;
+  border-color: #9bb184;
+}
+:root[data-theme="retro"] .admin-message.error {
+  color: #913f2f;
+  background: #f2dace;
+  border-color: #c0927d;
+}
+:root[data-theme="retro"] .admin-session .error-text {
+  color: #913f2f;
+}
+:root[data-theme="retro"] .admin-setup {
+  color: #6a5c37;
+  background: #ede2c1;
+  border-color: #b6a478;
+}
+:root[data-theme="retro"] .admin-setup p {
+  color: #6d623b;
+}
+:root[data-theme="retro"] .wizard-progress {
+  color: #875033;
+}
+:root[data-theme="retro"] .wizard-step.is-open {
+  border-color: #8d9b78;
+  border-left: 4px solid #5a774c;
+}
+:root[data-theme="retro"] .step-heading {
+  color: #405937;
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .step-heading:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+:root[data-theme="retro"] .step-heading:hover:not(:disabled) {
+  background: #edf0dc;
+}
+:root[data-theme="retro"] .step-heading .step-number {
+  color: #fff9e9;
+  background: #55784e;
+  box-shadow: inset 0 1px #a2b990;
+}
+:root[data-theme="retro"] .step-heading .complete {
+  color: #456c3e;
+  background: #d6e2be;
+}
+:root[data-theme="retro"] .step-copy small,
+:root[data-theme="retro"] .step-chevron {
+  color: #627452;
+}
+:root[data-theme="retro"] .step-body form {
+  border-color: #adb897;
+}
+:root[data-theme="retro"] .admin-room-code {
+  color: #9c4c28;
+}
+:root[data-theme="retro"] .admin-room-summary dt {
+  color: #677556;
+}
+:root[data-theme="retro"] .admin-device {
+  border-color: #b3bb9f;
+}
+:root[data-theme="retro"] .admin-title .admin-logout {
+  color: #845a46;
+}
+:root[data-theme="retro"] .connection-ready {
+  color: #385737;
+  background: #e2e8d0;
+  border-color: #9ab184;
+  border-radius: 6px;
+}
+:root[data-theme="retro"] .connection-ready b {
+  color: #3f683c;
+}
+:root[data-theme="retro"] .connection-ready p {
+  color: #596e4a;
+}
+:root[data-theme="retro"] .guest-shell > .brand {
+  color: #9a4f29;
+}
+:root[data-theme="retro"] .guest-shell > .brand small {
+  color: #66764e;
+}
+:root[data-theme="retro"] .guest-shell > .panel {
+  color: #3c5430;
+  background: #f2edda;
+  border-color: #a3b08d;
+  border-top: 5px solid #547553;
+  border-radius: 8px;
+}
+:root[data-theme="retro"] .guest-status,
+:root[data-theme="retro"] .guest-status > span:last-child {
+  color: #507247;
+}
+@media (min-width: 1550px) {
+  :root[data-theme="retro"] .page-heading h1 {
+    font-size: 40px;
+  }
+  :root[data-theme="retro"] .instrument-readout {
+    grid-template-columns: minmax(0, 1fr) 92px;
+  }
+  :root[data-theme="retro"] .channel-card .intensity strong {
+    font-size: 60px;
+  }
+}
+@media (max-width: 1180px) {
+  :root[data-theme="retro"] .retro-wordmark b {
+    font-size: 28px;
+  }
+  :root[data-theme="retro"] .deck-signature > span {
+    display: none;
+  }
+  :root[data-theme="retro"] .channel-card {
+    padding: 17px;
+  }
+  :root[data-theme="retro"] .instrument-readout {
+    grid-template-columns: minmax(0, 1fr) 62px;
+    gap: 9px;
+  }
+  :root[data-theme="retro"] .channel-card .intensity strong {
+    font-size: 40px;
+  }
+  :root[data-theme="retro"] .intensity > div {
+    font-size: 10px;
+  }
+  :root[data-theme="retro"] .intensity small {
+    font-size: 9px;
+  }
+  :root[data-theme="retro"] .top-actions {
+    gap: 12px;
+  }
+}
+@media (max-width: 1000px) {
+  :root[data-theme="retro"] .retro-wordmark {
+    display: none;
+  }
+  :root[data-theme="retro"] .sidebar .brand {
+    padding: 0;
+  }
+  :root[data-theme="retro"] .sidebar nav button {
+    height: auto;
+  }
+  :root[data-theme="retro"] .page-heading h1 {
+    font-size: 30px;
+  }
+}
+@media (max-width: 760px) {
+  :root[data-theme="retro"] .sidebar {
+    background: #e5deccfa;
+    border-top: 1px solid #a9b092;
+    border-right: 0;
+    padding: 0 5px env(safe-area-inset-bottom);
+  }
+  :root[data-theme="retro"] .sidebar nav {
+    gap: 4px;
+  }
+  :root[data-theme="retro"] .sidebar nav button {
+    height: 100%;
+    background: transparent;
+    color: #5a6e4b;
+    font-size: 10px;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  :root[data-theme="retro"] .sidebar nav button.active {
+    color: #385b35;
+    background: #d9e0c2;
+    box-shadow: inset 0 3px 0 #a85832;
+  }
+  :root[data-theme="retro"] .sidebar nav button:active:not(:disabled) {
+    transform: none;
+  }
+  :root[data-theme="retro"] .topbar {
+    padding: env(safe-area-inset-top) 16px 0;
+    height: calc(60px + env(safe-area-inset-top));
+  }
+  :root[data-theme="retro"] .top-actions {
+    gap: 10px;
+  }
+  :root[data-theme="retro"] .account {
+    min-height: 44px;
+    font-size: 11px;
+  }
+  :root[data-theme="retro"] .connection-pill {
+    font-size: 10px;
+  }
+  :root[data-theme="retro"] .banner {
+    padding: 9px 16px;
+    font-size: 10px;
+  }
+  :root[data-theme="retro"] .banner button {
+    min-height: 32px;
+  }
+  :root[data-theme="retro"] main {
+    padding: 18px 16px;
+  }
+  :root[data-theme="retro"] .page-heading {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  :root[data-theme="retro"] .page-heading h1 {
+    font-size: 28px;
+    margin: 8px 0;
+  }
+  :root[data-theme="retro"] .page-heading .muted {
+    font-size: 11px;
+    max-width: none;
+  }
+  :root[data-theme="retro"] .eyebrow {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  :root[data-theme="retro"] .deck-signature {
+    display: none;
+  }
+  :root[data-theme="retro"] .feature-nav {
+    gap: 7px;
+    margin-bottom: 19px;
+  }
+  :root[data-theme="retro"] .feature-nav button {
+    flex: 1;
+    min-height: 44px;
+    padding: 9px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  :root[data-theme="retro"] .device-strip {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  :root[data-theme="retro"] .device-symbol {
+    width: 32px;
+    height: 36px;
+  }
+  :root[data-theme="retro"] .device-details span {
+    font-size: 10px;
+  }
+  :root[data-theme="retro"] .device-buttons button {
+    min-height: 44px;
+  }
+  :root[data-theme="retro"] .main-content {
+    gap: 16px;
+  }
+  :root[data-theme="retro"] .channel-card {
+    padding: 18px;
+  }
+  :root[data-theme="retro"] .instrument-readout {
+    grid-template-columns: minmax(0, 1fr) 75px;
+    margin: 18px 0;
+    gap: 13px;
+  }
+  :root[data-theme="retro"] .channel-card .intensity strong {
+    font-size: 46px;
+  }
+  :root[data-theme="retro"] .intensity > div {
+    font-size: 11px;
+  }
+  :root[data-theme="retro"] .intensity small {
+    font-size: 10px;
+  }
+  :root[data-theme="retro"] .channel-card .steps button {
+    width: 48px;
+    height: 48px;
+  }
+  :root[data-theme="retro"] .channel-card .steps select {
+    font-size: 16px;
+  }
+  :root[data-theme="retro"] .set-target input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  :root[data-theme="retro"] .channel-card .button-row button {
+    min-height: 44px;
+    font-size: 12px;
+  }
+  :root[data-theme="retro"] .panel .field input:not([type="checkbox"]),
+  :root[data-theme="retro"] .panel .field select {
+    font-size: 16px;
+  }
+  :root[data-theme="retro"] .panel .field input[type="number"] {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  :root[data-theme="retro"] .fire-button {
+    max-width: 150px;
+  }
+  :root[data-theme="retro"] .fire-controls {
+    padding: 12px 5px;
+    gap: 17px;
+  }
+  :root[data-theme="retro"] .control-dock {
+    padding: 10px 14px;
+  }
+  :root[data-theme="retro"] .control-dock b {
+    font-size: 11px;
+  }
+  :root[data-theme="retro"] .control-dock b span {
+    font-size: 13px;
+  }
+  :root[data-theme="retro"] .control-dock small {
+    font-size: 10px;
+  }
+  :root[data-theme="retro"] .control-dock .danger {
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+  :root[data-theme="retro"] .admin-shell {
+    padding: 0 16px 28px;
+  }
+  :root[data-theme="retro"] .admin-main {
+    padding: 24px 0;
+  }
+  :root[data-theme="retro"] .admin-brand {
+    font-size: 17px;
+    gap: 8px;
+  }
+  :root[data-theme="retro"] .admin-header {
+    gap: 8px;
+  }
+  :root[data-theme="retro"] .admin-back {
+    padding: 5px;
+    gap: 5px;
+  }
+  :root[data-theme="retro"] .admin-back svg {
+    display: none;
+  }
+  :root[data-theme="retro"] .admin-gate {
+    margin-top: 32px;
+    padding: 26px 22px;
+  }
+}
+@media (min-width: 601px) and (max-width: 760px) {
+  :root[data-theme="retro"] .channel-card {
+    padding: 15px;
+  }
+  :root[data-theme="retro"] .instrument-readout {
+    grid-template-columns: minmax(0, 1fr) 60px;
+    gap: 7px;
+  }
+  :root[data-theme="retro"] .channel-card .intensity strong {
+    font-size: 38px;
+  }
+  :root[data-theme="retro"] .intensity > div {
+    font-size: 9px;
+  }
+  :root[data-theme="retro"] .intensity small {
+    font-size: 8px;
+  }
+}
+@media (max-width: 380px) {
+  :root[data-theme="retro"] .instrument-readout {
+    grid-template-columns: minmax(0, 1fr) 64px;
+    gap: 10px;
+  }
+  :root[data-theme="retro"] .channel-card .intensity strong {
+    font-size: 40px;
+  }
+  :root[data-theme="retro"] .fire-button {
+    min-height: 108px;
+  }
+  :root[data-theme="retro"] .fire-button > strong {
+    font-size: 29px;
+  }
+  :root[data-theme="retro"] .fire-button > span {
+    font-size: 9px;
+  }
+}

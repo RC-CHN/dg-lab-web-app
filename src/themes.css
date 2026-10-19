@@ -1,0 +1,1522 @@
+/* Appearance controls are shared by the console, admin and guest routes. */
+.arcade-wordmark,
+.arcade-kicker,
+.deck-signature,
+.meter-scale {
+  display: none;
+}
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.guest-shell {
+  position: relative;
+}
+.guest-theme {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+.theme-switch {
+  position: relative;
+  flex: none;
+  z-index: 45;
+}
+.theme-trigger {
+  min-width: 72px;
+  min-height: 44px;
+  font-size: 12px;
+}
+.theme-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  width: 284px;
+  max-width: calc(100vw - 28px);
+  padding: 14px;
+  background: #151c24;
+  color: #edf4f8;
+  border: 1px solid #536375;
+  border-radius: 10px;
+  box-shadow: 0 16px 50px #000b;
+}
+.theme-menu > p {
+  font-size: 12px;
+  color: #b7c4d1;
+  margin: 0 0 12px;
+}
+.theme-menu .theme-option {
+  width: 100%;
+  min-height: 76px;
+  justify-content: flex-start;
+  gap: 12px;
+  text-align: left;
+  background: #202936;
+  border: 1px solid #405063;
+  color: #eef3f6;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+.theme-menu .theme-option[aria-pressed="true"] {
+  border-color: #dcff50;
+}
+.theme-option > span:nth-child(2) {
+  flex: 1;
+}
+.theme-option b {
+  display: block;
+  font-size: 14px;
+}
+.theme-option small {
+  display: block;
+  font-size: 11px;
+  margin-top: 6px;
+  color: #b6c3d2;
+}
+.theme-swatch {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: #0b1016;
+  color: #dcff50;
+  border: 1px solid #dcff50;
+}
+.theme-classic .theme-swatch {
+  color: #f5bd67;
+  border-color: #947d50;
+  border-radius: 10px;
+  background: #303025;
+}
+
+/* PULSE DECK — acid-lime keys, cyan second channel, dark machine housing. */
+:root[data-theme="arcade"] {
+  --bg: #090c10;
+  --panel: #141a23;
+  --line: #303c4b;
+  --muted: #a6b3c4;
+  --accent: #dcff50;
+  --mint: #65e1f2;
+  --red: #ff747f;
+  color: #f1f4f8;
+  background: var(--bg);
+  font-family: "Arial", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+:root[data-theme="arcade"] body {
+  background:
+    radial-gradient(#4b5e731c 1px, transparent 1px) 0 0 / 18px 18px,
+    var(--bg);
+}
+:root[data-theme="arcade"] button {
+  border-radius: 3px;
+  border-color: #435267;
+  color: #e6eef8;
+  background: #202a37;
+  box-shadow: 0 3px 0 #06090d;
+}
+:root[data-theme="arcade"] button:hover:not(:disabled) {
+  background: #2b394a;
+  border-color: #a1b2c9;
+}
+:root[data-theme="arcade"] button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #06090d;
+}
+:root[data-theme="arcade"] button:focus-visible,
+:root[data-theme="arcade"] a:focus-visible,
+:root[data-theme="arcade"] summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+:root[data-theme="arcade"] input,
+:root[data-theme="arcade"] select,
+:root[data-theme="arcade"] textarea {
+  border-radius: 3px;
+  border-color: #47566b;
+  background: #0c1119;
+  color: #f1f4f8;
+}
+:root[data-theme="arcade"] input:focus,
+:root[data-theme="arcade"] select:focus,
+:root[data-theme="arcade"] textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px #dcff5020;
+}
+:root[data-theme="arcade"] input[type="range"] {
+  box-shadow: none;
+  background: transparent;
+}
+:root[data-theme="arcade"] input::placeholder,
+:root[data-theme="arcade"] textarea::placeholder {
+  color: #8395ab;
+}
+:root[data-theme="arcade"] .primary {
+  color: #101507;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 4px 0 #6b7c2b;
+  font-weight: 750;
+}
+:root[data-theme="arcade"] .primary:hover:not(:disabled) {
+  color: #101507;
+  background: #e7ff8a;
+  border-color: #e7ff8a;
+}
+:root[data-theme="arcade"] .primary:active:not(:disabled) {
+  box-shadow: 0 1px 0 #6b7c2b;
+}
+:root[data-theme="arcade"] .danger {
+  color: #ffc4c9;
+  background: #3a1e2a;
+  border-color: #ad5866;
+  box-shadow: 0 3px 0 #1a090f;
+}
+:root[data-theme="arcade"] .danger:hover:not(:disabled) {
+  background: #542636;
+  border-color: #ff8b96;
+}
+:root[data-theme="arcade"] .subtle,
+:root[data-theme="arcade"] .icon-button,
+:root[data-theme="arcade"] .account {
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] .subtle:hover:not(:disabled),
+:root[data-theme="arcade"] .account:hover:not(:disabled) {
+  color: var(--accent);
+  background: transparent;
+  border-color: transparent;
+}
+:root[data-theme="arcade"] .hint,
+:root[data-theme="arcade"] .muted,
+:root[data-theme="arcade"] .field,
+:root[data-theme="arcade"] .switch-label {
+  color: var(--muted);
+}
+:root[data-theme="arcade"] .hint {
+  font-size: 12px;
+}
+:root[data-theme="arcade"] .field small {
+  color: #9aaac0;
+}
+:root[data-theme="arcade"] .field > span {
+  font-size: 12px;
+}
+:root[data-theme="arcade"] .sidebar {
+  background: #0e131b;
+  border-right: 1px solid #344052;
+  padding-top: 24px;
+}
+:root[data-theme="arcade"] .sidebar .brand {
+  font-size: 15px;
+  letter-spacing: 2px;
+  gap: 8px;
+  padding: 0 9px;
+}
+:root[data-theme="arcade"] .sidebar .brand small {
+  display: none;
+}
+:root[data-theme="arcade"] .sidebar .brand-icon {
+  width: 24px;
+  height: 28px;
+}
+:root[data-theme="arcade"] .sidebar .brand-icon svg {
+  width: 21px;
+}
+:root[data-theme="arcade"] .arcade-wordmark {
+  display: block;
+  margin: 24px 8px 0;
+  color: #f3f6f8;
+  font:
+    900 italic 41px/0.88 "Arial Black",
+    Arial,
+    sans-serif;
+  letter-spacing: -3px;
+}
+:root[data-theme="arcade"] .arcade-wordmark > span {
+  display: block;
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .wordmark-dot {
+  font-size: 24px;
+  margin-left: 5px;
+  vertical-align: top;
+}
+:root[data-theme="arcade"] .arcade-wordmark small {
+  display: block;
+  font:
+    9px/1.5 ui-monospace,
+    monospace;
+  letter-spacing: 1.9px;
+  margin-top: 17px;
+  color: #9caec6;
+}
+:root[data-theme="arcade"] .nav-caption {
+  margin-top: 35px;
+  color: #96a4b8;
+  font:
+    10px ui-monospace,
+    monospace;
+}
+:root[data-theme="arcade"] .sidebar nav button {
+  color: #b8c5d6;
+  height: 50px;
+  border-radius: 3px;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] .sidebar nav button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #121907;
+  font-weight: 750;
+  box-shadow: 3px 3px 0 #576b2c;
+}
+:root[data-theme="arcade"] .sidebar nav button.active .nav-dot {
+  background: #20290c;
+  border-radius: 0;
+}
+:root[data-theme="arcade"] .sidebar nav button:not(.active):hover {
+  color: #f2f7ff;
+  background: #1c2837;
+}
+:root[data-theme="arcade"] .sidebar-bottom {
+  border-top: 1px solid #334052;
+  padding: 22px 10px 0;
+}
+:root[data-theme="arcade"] .sidebar-bottom p,
+:root[data-theme="arcade"] .version,
+:root[data-theme="arcade"] .rail-caption {
+  color: #8f9eb1;
+}
+:root[data-theme="arcade"] .system-label {
+  color: #c0cede;
+}
+:root[data-theme="arcade"] .topbar {
+  background: #0c1118;
+  border-color: #334052;
+  height: 68px;
+}
+:root[data-theme="arcade"] .breadcrumb {
+  color: #9cacc0;
+  font:
+    11px ui-monospace,
+    monospace;
+}
+:root[data-theme="arcade"] .breadcrumb b {
+  color: #e6edf6;
+}
+:root[data-theme="arcade"] .top-actions {
+  gap: 18px;
+}
+:root[data-theme="arcade"] .connection-pill {
+  font-size: 11px;
+  color: #a6b3c4;
+}
+:root[data-theme="arcade"] .connection-pill.live {
+  color: var(--mint);
+}
+:root[data-theme="arcade"] .status-dot {
+  border-radius: 1px;
+}
+:root[data-theme="arcade"] .status-dot.green,
+:root[data-theme="arcade"] .live .status-dot {
+  background: var(--mint);
+  box-shadow: 0 0 10px #65e1f245;
+}
+:root[data-theme="arcade"] .theme-trigger {
+  background: #182330;
+  border-color: #435267;
+  color: #cad6e6;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] .theme-menu {
+  border-radius: 4px;
+}
+:root[data-theme="arcade"] .banner {
+  color: #c7d69e;
+  background: #1b2515;
+  border-color: #45582a;
+  font-size: 11px;
+}
+:root[data-theme="arcade"] .banner button {
+  color: #e0efb9;
+  box-shadow: none;
+  background: transparent;
+}
+:root[data-theme="arcade"] .banner.error {
+  color: #ffc4c9;
+  background: #391e2a;
+  border-color: #834453;
+}
+:root[data-theme="arcade"] main {
+  padding-top: 30px;
+}
+:root[data-theme="arcade"] .page-heading {
+  min-height: 108px;
+  margin-bottom: 25px;
+  padding: 0 0 24px;
+  border-bottom: 1px solid #344052;
+  align-items: center;
+}
+:root[data-theme="arcade"] .page-heading h1 {
+  font-size: 38px;
+  font-weight: 850;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin: 12px 0;
+}
+:root[data-theme="arcade"] .page-heading .muted {
+  font-size: 13px;
+  color: #a6b3c4;
+}
+:root[data-theme="arcade"] .eyebrow {
+  color: var(--accent);
+  font:
+    10px ui-monospace,
+    monospace;
+  letter-spacing: 1.5px;
+}
+:root[data-theme="arcade"] .arcade-kicker {
+  display: inline;
+}
+:root[data-theme="arcade"] .deck-signature {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: none;
+}
+:root[data-theme="arcade"] .deck-signature > span {
+  color: #92a4bb;
+  font:
+    9px/1.9 ui-monospace,
+    monospace;
+  letter-spacing: 1px;
+  text-align: right;
+}
+:root[data-theme="arcade"] .deck-signature strong {
+  color: #f0f4f9;
+  font:
+    900 italic 68px/0.9 "Arial Black",
+    Arial,
+    sans-serif;
+  letter-spacing: -6px;
+}
+:root[data-theme="arcade"] .deck-signature strong > span {
+  color: var(--accent);
+  font-size: 35px;
+  margin-left: 9px;
+  vertical-align: top;
+}
+:root[data-theme="arcade"] .signature-stripes {
+  height: 63px;
+  width: 26px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--accent) 0 4px,
+    transparent 4px 8px
+  );
+}
+:root[data-theme="arcade"] .feature-nav {
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid #425065;
+  padding: 4px;
+  background: #0d131d;
+  border-radius: 3px;
+  margin-bottom: 24px;
+}
+:root[data-theme="arcade"] .feature-nav button {
+  background: transparent;
+  color: #aebed2;
+  border: 1px solid transparent;
+  box-shadow: none;
+  min-height: 42px;
+  border-radius: 1px;
+  padding: 10px 19px;
+  font-size: 12px;
+}
+:root[data-theme="arcade"] .feature-nav button.active {
+  color: var(--accent);
+  background: #202c20;
+  border-color: #627c35;
+}
+:root[data-theme="arcade"] .feature-nav button:not(.active):hover {
+  background: #1e2b3d;
+  color: #f0f4f8;
+  border-color: transparent;
+}
+:root[data-theme="arcade"] .panel {
+  border-radius: 5px;
+  border-color: #344153;
+  background: #141b25;
+}
+:root[data-theme="arcade"] .section-heading h2 {
+  color: #e5edf8;
+  font-size: 15px;
+  font-weight: 750;
+}
+:root[data-theme="arcade"] .section-tag {
+  color: var(--accent);
+  border-color: #526b34;
+  background: #1c2918;
+  border-radius: 1px;
+  font:
+    9px ui-monospace,
+    monospace;
+  padding: 4px 6px;
+}
+:root[data-theme="arcade"] .device-strip {
+  background: #101721;
+  border: 1px dashed #4b5b71;
+  border-radius: 3px;
+  padding: 13px 16px;
+}
+:root[data-theme="arcade"] .device-symbol {
+  background: #1c2a37;
+  border-color: #41556c;
+  color: var(--mint);
+  border-radius: 3px;
+  width: 38px;
+  height: 40px;
+}
+:root[data-theme="arcade"] .device-details b {
+  letter-spacing: 0.8px;
+}
+:root[data-theme="arcade"] .device-details span {
+  margin-top: 5px;
+  color: #a2b2c5;
+}
+:root[data-theme="arcade"] .channel-card {
+  position: relative;
+  border: 1px solid #4a5940;
+  border-top: 4px solid var(--channel);
+  border-radius: 4px;
+  background: linear-gradient(135deg, #23301b55, transparent 65%), #141b22;
+  padding: 23px;
+}
+:root[data-theme="arcade"] .channel-card.mint {
+  border-color: #345766;
+  border-top-color: var(--mint);
+  background: linear-gradient(135deg, #18364377, transparent 65%), #141b22;
+}
+:root[data-theme="arcade"] .channel-card::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid #748295;
+  border-radius: 50%;
+  pointer-events: none;
+}
+:root[data-theme="arcade"] .channel-badge {
+  background: var(--channel);
+  border: 0;
+  color: #11170e;
+  width: 38px;
+  height: 38px;
+  font:
+    800 23px ui-monospace,
+    monospace;
+  border-radius: 2px;
+  box-shadow: 2px 2px 0 #03070b;
+}
+:root[data-theme="arcade"] .channel-top h3 {
+  font-size: 14px;
+}
+:root[data-theme="arcade"]
+  .channel-top
+  span:not(.channel-badge):not(.status-dot) {
+  color: #9eafc2;
+  font-size: 10px;
+}
+:root[data-theme="arcade"] .intensity {
+  margin: 24px 0 18px;
+  align-items: flex-end;
+}
+:root[data-theme="arcade"] .intensity strong {
+  font-size: 86px;
+  font-weight: 750;
+  letter-spacing: -7px;
+  text-shadow: 0 0 25px color-mix(in srgb, var(--channel) 12%, transparent);
+}
+:root[data-theme="arcade"] .intensity > div {
+  padding-bottom: 6px;
+  color: #ccd7e3;
+  font-size: 11px;
+}
+:root[data-theme="arcade"] .intensity small {
+  color: #a2b1c3;
+}
+:root[data-theme="arcade"] .intensity-meter {
+  height: 12px;
+  background: #060c13;
+  border-radius: 0;
+  margin-bottom: 0;
+  mask-image: repeating-linear-gradient(
+    90deg,
+    #000 0 7px,
+    transparent 7px 10px
+  );
+}
+:root[data-theme="arcade"] .intensity-meter i {
+  box-shadow: 0 0 12px var(--channel);
+}
+:root[data-theme="arcade"] .meter-scale {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0 19px;
+  color: #a4b3c5;
+  font:
+    9px ui-monospace,
+    monospace;
+  letter-spacing: 1px;
+}
+:root[data-theme="arcade"] .steps {
+  gap: 9px;
+}
+:root[data-theme="arcade"] .steps button {
+  width: 48px;
+  height: 46px;
+  background: color-mix(in srgb, var(--channel) 9%, #141b25);
+  border-color: color-mix(in srgb, var(--channel) 45%, #263442);
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .steps button svg {
+  width: 22px;
+  height: 22px;
+}
+:root[data-theme="arcade"] .steps select {
+  background: #0d131b;
+  color: #ccd8e7;
+  font:
+    12px ui-monospace,
+    monospace;
+}
+:root[data-theme="arcade"] .set-target input {
+  height: 42px;
+  font:
+    15px ui-monospace,
+    monospace;
+}
+:root[data-theme="arcade"] .set-target button {
+  color: #dbe5f1;
+}
+:root[data-theme="arcade"] .channel-card .button-row button {
+  background: #1b2532;
+  color: #bdcadd;
+}
+:root[data-theme="arcade"] .channel-card details {
+  border-top-color: #3a4759;
+}
+:root[data-theme="arcade"] .channel-card summary {
+  color: #adbdcf;
+}
+:root[data-theme="arcade"] .channel-card details .full {
+  border-color: #697f46;
+  color: var(--channel);
+}
+:root[data-theme="arcade"] .readouts,
+:root[data-theme="arcade"] dt {
+  color: #a3b3c6;
+}
+:root[data-theme="arcade"] .readouts b,
+:root[data-theme="arcade"] dd {
+  color: #e1eaf5;
+}
+:root[data-theme="arcade"] .quick-wave {
+  background: #101822;
+  border-color: #43536a;
+  border-radius: 3px;
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .quick-wave:nth-child(2) {
+  color: var(--mint);
+}
+:root[data-theme="arcade"] .quick-wave:nth-child(3) {
+  color: #c5a4ff;
+}
+:root[data-theme="arcade"] .quick-wave > span {
+  color: #dbe6f2;
+}
+:root[data-theme="arcade"] .feedback button {
+  background: #1e2a38;
+  color: #b5c7dd;
+  min-height: 38px;
+}
+:root[data-theme="arcade"] .connection,
+:root[data-theme="arcade"] .playback {
+  background: #101720;
+}
+:root[data-theme="arcade"] .connection-summary,
+:root[data-theme="arcade"] .room-owner {
+  color: #adbed2;
+}
+:root[data-theme="arcade"] .room-code {
+  font-weight: 800;
+  font-size: 28px;
+}
+:root[data-theme="arcade"] .playback-item small,
+:root[data-theme="arcade"] .note p {
+  color: #9eafc3;
+}
+:root[data-theme="arcade"] .playback-item b,
+:root[data-theme="arcade"] .note b {
+  color: #d2deed;
+}
+:root[data-theme="arcade"] .channel-letter {
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--channel) 35%, transparent);
+}
+:root[data-theme="arcade"] .wave-grid {
+  stroke: #a0c8ff15;
+}
+:root[data-theme="arcade"] .wave-tile {
+  border-radius: 3px;
+  background: #111923;
+  border-color: #3b4b60;
+}
+:root[data-theme="arcade"] .wave-tile.active {
+  background: #26331b;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .wave-tile span {
+  color: #a1b2c6;
+}
+:root[data-theme="arcade"] .waveform-detail {
+  border-color: #4d5d41;
+  background: #121b1a;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .scene-card,
+:root[data-theme="arcade"] .scene-card:nth-child(2),
+:root[data-theme="arcade"] .scene-card.random {
+  background: #17232c;
+  border-color: #425b71;
+  color: var(--mint);
+  border-radius: 4px;
+}
+:root[data-theme="arcade"] .scene-card:nth-child(2) {
+  background: #26271b;
+  border-color: #66703d;
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .scene-card.random {
+  background: #251f35;
+  border-color: #5f5179;
+  color: #c9b1ff;
+}
+:root[data-theme="arcade"] .queue-row {
+  border-color: #35455a;
+}
+:root[data-theme="arcade"] .log-row {
+  border-color: #344153;
+  color: #ccd9e9;
+}
+:root[data-theme="arcade"] .log-row.error,
+:root[data-theme="arcade"] .log-row.stop {
+  color: #ffa2ae;
+}
+:root[data-theme="arcade"] .log-row time {
+  color: #91a8c4;
+}
+:root[data-theme="arcade"] .segmented {
+  background: #0a111a;
+  border-color: #44576d;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .segmented button {
+  color: #a2b6ce;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] .segmented button.active {
+  background: var(--accent);
+  color: #151c0b;
+}
+:root[data-theme="arcade"] .touchpad,
+:root[data-theme="arcade"] .record-pad {
+  border-radius: 4px;
+  border: 1px solid #6a8c3d;
+  background:
+    linear-gradient(#dcff5007 1px, transparent 1px),
+    linear-gradient(90deg, #dcff5007 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 60%, #263824, #0a131a 80%);
+  background-size:
+    32px 32px,
+    32px 32px,
+    auto;
+}
+:root[data-theme="arcade"] .pad-center > svg,
+:root[data-theme="arcade"] .pad-center strong {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .pad-center > span,
+:root[data-theme="arcade"] .pad-top,
+:root[data-theme="arcade"] .pad-bottom {
+  color: #aac29b;
+}
+:root[data-theme="arcade"] .rhythm-grid {
+  background: #4b6837;
+}
+:root[data-theme="arcade"] .rhythm-grid > div {
+  background: #152722;
+}
+:root[data-theme="arcade"] .rhythm-grid > div:nth-child(3n) {
+  background: #172330;
+}
+:root[data-theme="arcade"] .rhythm-grid b {
+  color: #d8efbd;
+}
+:root[data-theme="arcade"] .rhythm-grid span {
+  color: #9ab483;
+}
+:root[data-theme="arcade"] .fire-button {
+  border-radius: 50%;
+  aspect-ratio: 1;
+  max-width: 180px;
+  min-height: 130px;
+  border: 3px solid color-mix(in srgb, var(--channel) 55%, #101820);
+  background: radial-gradient(
+    circle at 40% 30%,
+    color-mix(in srgb, var(--channel) 15%, #14202a),
+    #111923
+  );
+  box-shadow:
+    0 7px 0 #03080e,
+    0 0 0 6px #1d2936;
+  color: var(--channel);
+}
+:root[data-theme="arcade"] .fire-button:active:not(:disabled),
+:root[data-theme="arcade"] .fire-button.firing {
+  transform: translateY(5px);
+  box-shadow:
+    0 2px 0 #03080e,
+    0 0 20px color-mix(in srgb, var(--channel) 25%, transparent);
+  background: color-mix(in srgb, var(--channel) 24%, #14202a);
+}
+:root[data-theme="arcade"] .fire-button strong {
+  font-size: 39px;
+  font-weight: 750;
+}
+:root[data-theme="arcade"] .fire-button > span {
+  color: #d0dddb;
+  font-size: 11px;
+}
+:root[data-theme="arcade"] .fire-controls {
+  justify-content: space-around;
+  padding: 12px 8px;
+  gap: 20px;
+}
+:root[data-theme="arcade"] .lab-transport {
+  background: #11212a;
+  border-color: #395c6e;
+  border-left: 3px solid var(--mint);
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .lab-transport b {
+  color: #d9edf6;
+}
+:root[data-theme="arcade"] .lab-transport small {
+  color: #9dbbcf;
+}
+:root[data-theme="arcade"] .lab-tracks > div,
+:root[data-theme="arcade"] .curve-editor,
+:root[data-theme="arcade"] .dj-decks > div,
+:root[data-theme="arcade"] .invite-box,
+:root[data-theme="arcade"] .branch-nodes > details,
+:root[data-theme="arcade"] .guest-wave {
+  background: #0e1823;
+  border-color: #40556d;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .lab-tracks > div > span {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .lab-tracks > div:nth-child(2) > span {
+  color: var(--mint);
+}
+:root[data-theme="arcade"] .branch-choice {
+  background: #242e1c;
+  border-color: #748b45;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .branch-choice .eyebrow {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .curve-editor .section-heading,
+:root[data-theme="arcade"] .curve-editor .section-heading small {
+  color: #aac0d4;
+}
+:root[data-theme="arcade"] .clip-library > details {
+  border-color: #35465a;
+}
+:root[data-theme="arcade"] .music-picks .switch-label {
+  color: #bed0df;
+}
+:root[data-theme="arcade"] .level-meter {
+  border-color: #466482;
+  background: #0b1520;
+}
+:root[data-theme="arcade"] .level-meter i {
+  background: var(--mint);
+}
+:root[data-theme="arcade"] .connection-guide {
+  color: #dfe8f5;
+  background: linear-gradient(125deg, #202b19, #101820 65%);
+  border: 1px solid #627644;
+  border-left: 5px solid var(--accent);
+  border-radius: 4px;
+  padding: 28px;
+}
+:root[data-theme="arcade"] .connection-guide > b,
+:root[data-theme="arcade"] .connection-guide > svg {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .connection-guide p {
+  color: #aebfd0;
+}
+:root[data-theme="arcade"] .control-dock {
+  background: #111923f7;
+  border-top: 2px solid #526174;
+  box-shadow: 0 -7px 35px #0006;
+}
+:root[data-theme="arcade"] .control-dock b {
+  color: #e8f0fa;
+  letter-spacing: 0.3px;
+}
+:root[data-theme="arcade"] .control-dock b span {
+  color: var(--accent);
+  font-family: ui-monospace, monospace;
+}
+:root[data-theme="arcade"] .control-dock small {
+  color: #a8bad0;
+}
+:root[data-theme="arcade"] .control-dock .danger {
+  background: #ff7481;
+  color: #230b10;
+  border-color: #ff9aa3;
+  font-weight: 800;
+  box-shadow: 0 4px 0 #923c4e;
+  border-radius: 3px;
+  padding: 12px 24px;
+}
+:root[data-theme="arcade"] .control-dock .danger:hover:not(:disabled) {
+  background: #ffa0a9;
+}
+:root[data-theme="arcade"] .toast {
+  background: #193529;
+  border-color: #658f6e;
+  color: #ddf6e4;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .toast.error,
+:root[data-theme="arcade"] .inline-error {
+  background: #3c1f2b;
+  border-color: #a15767;
+  color: #ffd3dd;
+}
+:root[data-theme="arcade"] .toast button {
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] footer {
+  border-color: #344052;
+  color: #94a6bd;
+  font-family: ui-monospace, monospace;
+}
+/* The same machine identity extends into account management and collaboration. */
+:root[data-theme="arcade"] .admin-shell {
+  background:
+    radial-gradient(#607c961a 1px, transparent 1px) 0 0 / 18px 18px,
+    #090d13;
+  color: #edf4fc;
+}
+:root[data-theme="arcade"] .admin-header {
+  border-color: #344153;
+}
+:root[data-theme="arcade"] .admin-brand {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .admin-brand small {
+  color: #92a8c1;
+}
+:root[data-theme="arcade"] .admin-back {
+  color: #bdcce0;
+}
+:root[data-theme="arcade"] .admin-shell h1 {
+  font-weight: 850;
+}
+:root[data-theme="arcade"] .admin-gate {
+  background: #141d28;
+  border-radius: 4px;
+  border: 1px solid #4e6244;
+  border-top: 5px solid var(--accent);
+  box-shadow:
+    8px 8px 0 #05090f,
+    0 0 80px #dcff5006;
+}
+:root[data-theme="arcade"] .admin-gate-icon {
+  border-radius: 3px;
+  color: #131b0b;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 #03080e;
+}
+:root[data-theme="arcade"] .admin-title .eyebrow {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .admin-lead,
+:root[data-theme="arcade"] .admin-shell .muted,
+:root[data-theme="arcade"] .admin-shell .hint,
+:root[data-theme="arcade"] .admin-footnote {
+  color: #a8bad0;
+}
+:root[data-theme="arcade"] .admin-session,
+:root[data-theme="arcade"] .admin-gate-footer {
+  color: #9cb2cc;
+}
+:root[data-theme="arcade"] .admin-session > span:first-child {
+  color: var(--mint);
+}
+:root[data-theme="arcade"] .admin-message {
+  background: #1b3025;
+  color: #d0e7c0;
+  border-color: #527344;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .admin-message.error {
+  background: #3c1f2b;
+  border-color: #a15767;
+  color: #ffd3dd;
+}
+:root[data-theme="arcade"] .admin-setup {
+  background: #272c1c;
+  color: #e5efcf;
+  border-color: #6c7b43;
+}
+:root[data-theme="arcade"] .admin-setup p {
+  color: #c4d2b2;
+}
+:root[data-theme="arcade"] .wizard-progress {
+  color: var(--accent);
+  font-family: ui-monospace, monospace;
+}
+:root[data-theme="arcade"] .wizard-step.is-open {
+  border-color: #798d46;
+  border-left: 4px solid var(--accent);
+}
+:root[data-theme="arcade"] .step-heading {
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] .step-heading:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+:root[data-theme="arcade"] .step-heading .step-number {
+  border-radius: 2px;
+  background: var(--accent);
+  color: #1b230b;
+  font-weight: 750;
+}
+:root[data-theme="arcade"] .step-heading .complete {
+  background: #193a36;
+  color: var(--mint);
+}
+:root[data-theme="arcade"] .step-copy small,
+:root[data-theme="arcade"] .step-chevron {
+  color: #a2b7cd;
+}
+:root[data-theme="arcade"] .step-body form {
+  border-top-color: #35495e;
+}
+:root[data-theme="arcade"] .admin-room-code {
+  color: var(--accent);
+  font-family: ui-monospace, monospace;
+}
+:root[data-theme="arcade"] .connection-ready {
+  background: #1d2b1b;
+  border: 1px solid #708d44;
+  border-radius: 3px;
+}
+:root[data-theme="arcade"] .connection-ready b {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .connection-ready p {
+  color: #bdcfaf;
+}
+:root[data-theme="arcade"] .guest-shell > .brand {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .guest-shell > .panel {
+  background: #141d28;
+  border-color: #435f72;
+  border-top: 4px solid var(--mint);
+  border-radius: 4px;
+}
+:root[data-theme="arcade"] .guest-shell h1 {
+  font-weight: 800;
+}
+:root[data-theme="arcade"] .guest-status,
+:root[data-theme="arcade"] .guest-status > span:last-child {
+  color: #b4ccde;
+}
+@media (min-width: 1550px) {
+  :root[data-theme="arcade"] main {
+    padding-top: 38px;
+  }
+  :root[data-theme="arcade"] .page-heading h1 {
+    font-size: 44px;
+  }
+  :root[data-theme="arcade"] .intensity strong {
+    font-size: 100px;
+  }
+}
+@media (max-width: 1180px) {
+  :root[data-theme="arcade"] .arcade-wordmark {
+    font-size: 35px;
+  }
+  :root[data-theme="arcade"] .signature-stripes {
+    display: none;
+  }
+  :root[data-theme="arcade"] .deck-signature > span {
+    display: none;
+  }
+  :root[data-theme="arcade"] .channel-card {
+    padding: 17px;
+  }
+  :root[data-theme="arcade"] .intensity strong {
+    font-size: 68px;
+  }
+  :root[data-theme="arcade"] .feature-nav button {
+    padding: 10px 13px;
+  }
+  :root[data-theme="arcade"] .top-actions {
+    gap: 12px;
+  }
+}
+@media (max-width: 1000px) {
+  :root[data-theme="arcade"] .arcade-wordmark {
+    display: none;
+  }
+  :root[data-theme="arcade"] .sidebar .brand {
+    padding: 0;
+  }
+  :root[data-theme="arcade"] .sidebar .brand-icon {
+    width: 34px;
+    height: 40px;
+  }
+  :root[data-theme="arcade"] .sidebar .brand-icon svg {
+    width: 26px;
+  }
+  :root[data-theme="arcade"] .sidebar nav button {
+    height: auto;
+  }
+  :root[data-theme="arcade"] .sidebar nav button.active {
+    box-shadow: 2px 2px 0 #576b2c;
+  }
+  :root[data-theme="arcade"] .page-heading h1 {
+    font-size: 31px;
+  }
+  :root[data-theme="arcade"] .intensity strong {
+    font-size: 80px;
+  }
+}
+@media (max-width: 760px) {
+  .theme-menu {
+    position: fixed;
+    right: 14px;
+    top: 63px;
+  }
+  .theme-trigger {
+    min-width: 44px;
+    width: 44px;
+    padding: 10px;
+  }
+  .theme-trigger > span {
+    display: none;
+  }
+  .admin-header-actions {
+    gap: 6px;
+  }
+  .admin-header-actions .theme-menu {
+    top: 72px;
+  }
+  .guest-theme .theme-menu {
+    top: 85px;
+  }
+  :root[data-theme="arcade"] .sidebar {
+    padding: 0 5px env(safe-area-inset-bottom);
+    border-top: 1px solid #4b5a70;
+    border-right: 0;
+    background: #101923fa;
+  }
+  :root[data-theme="arcade"] .sidebar nav button {
+    height: 100%;
+    font-size: 10px;
+    gap: 6px;
+    padding: 8px 2px;
+  }
+  :root[data-theme="arcade"] .sidebar nav button.active {
+    color: var(--accent);
+    background: #232f20;
+    box-shadow: inset 0 3px 0 var(--accent);
+    border-radius: 0;
+  }
+  :root[data-theme="arcade"] .sidebar nav button:active:not(:disabled) {
+    transform: none;
+  }
+  :root[data-theme="arcade"] .sidebar nav button:not(.active):hover {
+    background: transparent;
+  }
+  :root[data-theme="arcade"] .topbar {
+    height: 60px;
+    padding: 0 16px;
+  }
+  :root[data-theme="arcade"] .top-actions {
+    gap: 10px;
+  }
+  :root[data-theme="arcade"] .breadcrumb {
+    font-size: 10px;
+    gap: 5px;
+  }
+  :root[data-theme="arcade"] .account {
+    min-height: 44px;
+    font-size: 11px;
+  }
+  :root[data-theme="arcade"] .connection-pill {
+    font-size: 10px;
+    gap: 5px;
+  }
+  :root[data-theme="arcade"] .banner {
+    padding: 9px 16px;
+    font-size: 10px;
+  }
+  :root[data-theme="arcade"] .banner button {
+    min-width: 60px;
+    min-height: 32px;
+  }
+  :root[data-theme="arcade"] main {
+    padding: 22px 16px;
+  }
+  :root[data-theme="arcade"] .page-heading {
+    min-height: 0;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    gap: 10px;
+  }
+  :root[data-theme="arcade"] .page-heading h1 {
+    font-size: 29px;
+    margin: 12px 0 9px;
+    letter-spacing: -0.7px;
+  }
+  :root[data-theme="arcade"] .page-heading .muted {
+    font-size: 12px;
+    max-width: none;
+    line-height: 1.7;
+  }
+  :root[data-theme="arcade"] .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.8px;
+  }
+  :root[data-theme="arcade"] .deck-signature {
+    display: none;
+  }
+  :root[data-theme="arcade"] .feature-nav {
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  :root[data-theme="arcade"] .feature-nav button {
+    flex: 1;
+    padding: 9px 12px;
+    min-height: 44px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  :root[data-theme="arcade"] .device-strip {
+    padding: 12px;
+    gap: 10px;
+  }
+  :root[data-theme="arcade"] .device-symbol {
+    width: 32px;
+    height: 36px;
+  }
+  :root[data-theme="arcade"] .device-details b {
+    font-size: 12px;
+  }
+  :root[data-theme="arcade"] .device-details span {
+    font-size: 10px;
+  }
+  :root[data-theme="arcade"] .device-buttons button {
+    min-height: 44px;
+  }
+  :root[data-theme="arcade"] .main-content {
+    gap: 19px;
+  }
+  :root[data-theme="arcade"] .channel-grid {
+    gap: 18px;
+  }
+  :root[data-theme="arcade"] .channel-card {
+    padding: 20px;
+  }
+  :root[data-theme="arcade"] .channel-top h3 {
+    font-size: 14px;
+  }
+  :root[data-theme="arcade"]
+    .channel-top
+    span:not(.channel-badge):not(.status-dot) {
+    font-size: 11px;
+  }
+  :root[data-theme="arcade"] .intensity {
+    margin: 20px 0 16px;
+    gap: 20px;
+  }
+  :root[data-theme="arcade"] .intensity strong {
+    font-size: 86px;
+  }
+  :root[data-theme="arcade"] .channel-card .intensity strong {
+    font-size: 86px;
+  }
+  :root[data-theme="arcade"] .intensity > div {
+    font-size: 12px;
+  }
+  :root[data-theme="arcade"] .intensity small {
+    font-size: 11px;
+  }
+  :root[data-theme="arcade"] .channel-card .steps button {
+    width: 48px;
+    height: 48px;
+  }
+  :root[data-theme="arcade"] .channel-card .steps select {
+    font-size: 16px;
+  }
+  :root[data-theme="arcade"] .set-target input {
+    font-size: 16px;
+    height: 44px;
+  }
+  :root[data-theme="arcade"] .channel-card .button-row button {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  :root[data-theme="arcade"] .panel .field input:not([type="checkbox"]),
+  :root[data-theme="arcade"] .panel .field select {
+    font-size: 16px;
+  }
+  :root[data-theme="arcade"] .panel .field input[type="number"] {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  :root[data-theme="arcade"] .fire-button {
+    min-height: 132px;
+    max-width: 155px;
+  }
+  :root[data-theme="arcade"] .fire-button strong {
+    font-size: 34px;
+  }
+  :root[data-theme="arcade"] .fire-button > span {
+    font-size: 10px;
+  }
+  :root[data-theme="arcade"] .fire-controls {
+    gap: 16px;
+    padding: 12px 5px;
+  }
+  :root[data-theme="arcade"] .touchpad {
+    height: clamp(260px, 43svh, 355px);
+  }
+  :root[data-theme="arcade"] .control-dock {
+    border-top: 2px solid #4a5c73;
+    padding: 10px 14px;
+  }
+  :root[data-theme="arcade"] .control-dock .danger {
+    min-height: 48px;
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+  :root[data-theme="arcade"] .control-dock b {
+    font-size: 11px;
+  }
+  :root[data-theme="arcade"] .control-dock b span {
+    font-size: 14px;
+  }
+  :root[data-theme="arcade"] .control-dock small {
+    font-size: 10px;
+  }
+  :root[data-theme="arcade"] .connection-guide {
+    padding: 22px 18px;
+  }
+  :root[data-theme="arcade"] .admin-shell {
+    padding: 0 16px 28px;
+  }
+  :root[data-theme="arcade"] .admin-main {
+    padding: 24px 0;
+  }
+  :root[data-theme="arcade"] .admin-brand {
+    font-size: 17px;
+    gap: 8px;
+  }
+  :root[data-theme="arcade"] .admin-header {
+    gap: 8px;
+  }
+  :root[data-theme="arcade"] .admin-back {
+    font-size: 11px;
+    gap: 5px;
+    padding: 5px;
+  }
+  :root[data-theme="arcade"] .admin-back svg {
+    display: none;
+  }
+  :root[data-theme="arcade"] .admin-gate {
+    padding: 26px 22px;
+    margin-top: 34px;
+  }
+  :root[data-theme="arcade"] .admin-shell h1 {
+    font-size: 30px;
+  }
+}
+@media (max-width: 430px) {
+  .topbar .breadcrumb {
+    display: none;
+  }
+  .topbar .top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .topbar .theme-switch {
+    order: 2;
+  }
+  .topbar .account {
+    order: 3;
+  }
+  :root[data-theme="arcade"] .topbar .connection-pill {
+    font-size: 11px;
+  }
+  :root[data-theme="arcade"] .channel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 601px) and (max-width: 760px) {
+  :root[data-theme="arcade"] .channel-card {
+    padding: 16px;
+  }
+  :root[data-theme="arcade"] .channel-card .intensity strong {
+    font-size: 62px;
+    letter-spacing: -4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="arcade"] *,
+  :root[data-theme="arcade"] *::before,
+  :root[data-theme="arcade"] *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* Keep the first strength controls within thumb reach on a phone. */
+@media (max-width: 600px) {
+  :root[data-theme="arcade"] main {
+    padding-top: 18px;
+  }
+  :root[data-theme="arcade"] .page-heading {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  :root[data-theme="arcade"] .page-heading h1 {
+    font-size: 27px;
+    margin: 8px 0;
+  }
+  :root[data-theme="arcade"] .page-heading .muted {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  :root[data-theme="arcade"] .feature-nav {
+    margin-bottom: 16px;
+  }
+  :root[data-theme="arcade"] .main-content {
+    gap: 14px;
+  }
+  :root[data-theme="arcade"] .device-strip {
+    padding: 8px 12px;
+  }
+  :root[data-theme="arcade"] .channel-card {
+    padding: 16px;
+  }
+  :root[data-theme="arcade"] .channel-card .intensity {
+    margin: 14px 0 12px;
+  }
+  :root[data-theme="arcade"] .channel-card .intensity strong {
+    font-size: 76px;
+  }
+  :root[data-theme="arcade"] .meter-scale {
+    margin: 7px 0 14px;
+  }
+}
+@media (max-width: 380px) {
+  :root[data-theme="arcade"] .fire-button {
+    min-height: 110px;
+  }
+  :root[data-theme="arcade"] .fire-button strong {
+    font-size: 29px;
+  }
+  :root[data-theme="arcade"] .fire-button > span {
+    font-size: 9px;
+  }
+}
+/* Respect cutouts and the home indicator when Safari extends the viewport. */
+@media (max-width: 760px) {
+  .topbar {
+    padding-top: env(safe-area-inset-top);
+    height: calc(57px + env(safe-area-inset-top));
+  }
+  :root[data-theme="arcade"] .topbar {
+    padding-top: env(safe-area-inset-top);
+    height: calc(60px + env(safe-area-inset-top));
+  }
+  .admin-header {
+    padding-top: env(safe-area-inset-top);
+  }
+  .guest-shell {
+    padding-top: calc(30px + env(safe-area-inset-top));
+  }
+  .theme-menu {
+    top: calc(63px + env(safe-area-inset-top));
+  }
+  .admin-header-actions .theme-menu {
+    top: calc(72px + env(safe-area-inset-top));
+  }
+  .guest-theme .theme-menu {
+    top: calc(85px + env(safe-area-inset-top));
+  }
+}
+:root[data-theme="arcade"] .curve-editor > svg path {
+  stroke: #95b9df33;
+}
+:root[data-theme="arcade"] .curve-editor > svg polyline {
+  stroke: var(--accent);
+}
+:root[data-theme="arcade"] .curve-editor:nth-of-type(2) > svg polyline {
+  stroke: var(--mint);
+}
+:root[data-theme="arcade"] .curve-editor h3 {
+  color: #c2d8e7;
+}
+:root[data-theme="arcade"] .lab-tracks small {
+  color: #a3b6c9;
+}
+:root[data-theme="arcade"] .dj-decks > div {
+  color: var(--accent);
+}
+:root[data-theme="arcade"] .dj-decks > div:nth-child(2) {
+  color: var(--mint);
+}
+:root[data-theme="arcade"] .dj-fader {
+  background: #172331;
+  border-color: #4b627c;
+  border-radius: 3px;
+}

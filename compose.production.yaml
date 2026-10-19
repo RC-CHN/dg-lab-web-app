@@ -1,0 +1,36 @@
+services:
+  panel:
+    image: ${PANEL_IMAGE:-ghcr.io/rc-chn/dg-lab-web-app:latest}
+    restart: unless-stopped
+    init: true
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8787}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:8787:8787"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+  caddy:
+    image: caddy:2
+    profiles: [https]
+    restart: unless-stopped
+    environment:
+      PANEL_DOMAIN: ${PANEL_DOMAIN:?Set PANEL_DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - panel
+volumes:
+  caddy_data:
+  caddy_config:
