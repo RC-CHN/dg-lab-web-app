@@ -19,7 +19,7 @@ Kubernetes / K3s 使用 [集群部署说明](KUBERNETES.md) 和 `deploy/kubernet
 | --- | --- |
 | `latest` | 最近通过检查的 main，方便体验 |
 | `sha-完整40位提交SHA` | 可追溯部署与回滚 |
-| `v1.9.0` 等 | 对应发布标签 |
+| `v1.9.1` 等 | 对应发布标签 |
 
 Actions 只用内建 `GITHUB_TOKEN` 发布镜像，无需保存个人访问令牌。所有引用的 Actions 固定到提交 SHA，Dependabot 提供升级 PR。配置依据：[GitHub 镜像发布文档](https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images)。
 
@@ -76,8 +76,8 @@ bash scripts/deploy.sh ghcr.io/rc-chn/dg-lab-web-app:sha-完整提交SHA "$PWD"
 更新 `package.json` 与 `package-lock.json` 的版本及更新记录，完成本地验证并提交后：
 
 ```bash
-git tag -a v1.9.0 -m "Release v1.9.0"
-git push origin main v1.9.0
+git tag -a v1.9.1 -m "Release v1.9.1"
+git push origin main v1.9.1
 ```
 
-发布前更新包版本、锁文件和 CHANGELOG.md，运行 `npm run check:version`。使用带说明的版本标签（`git tag -a v1.9.0 -m "Release v1.9.0"`），已发布标签不移动、不复用。标签触发全部检查；版本不一致会直接失败，成功后生成版本镜像并自动创建 GitHub Release，附带源码包和 SHA-256 校验文件。`npm run release:archive` 仅打包已提交的 HEAD，不会收集 `.env`、测试截图、日志或任何未跟踪文件。第三方运行时与波形资源按当前仓库版本一并打包，许可说明随包提供。
+发布前更新包版本、锁文件和 CHANGELOG.md，运行 `npm run check:version`。使用带说明的版本标签（`git tag -a v1.9.1 -m "Release v1.9.1"`），已发布标签不移动、不复用。标签触发全部检查；版本不一致会直接失败，成功后生成版本镜像并自动创建 GitHub Release，附带源码包和 SHA-256 校验文件。`npm run release:archive` 仅打包已提交的 HEAD，不会收集 `.env`、测试截图、日志或任何未跟踪文件。第三方运行时与波形资源按当前仓库版本一并打包，许可说明随包提供。

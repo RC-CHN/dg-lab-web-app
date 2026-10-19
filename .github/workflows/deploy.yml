@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Published image tag: sha-<40 hex> or v1.9.0 (never latest)'
+        description: 'Published image tag: sha-<40 hex> or v1.9.1 (never latest)'
         type: string
         required: true
 
