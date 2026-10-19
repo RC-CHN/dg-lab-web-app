@@ -3,5 +3,6 @@ kind: ConfigMap
 metadata:
   name: dg-lab-web-app
 data:
+  ADMIN_SESSION_HOURS: "168"
   # Set the exact browser origin in your deployment overlay.
   APP_ORIGIN: http://localhost:8787

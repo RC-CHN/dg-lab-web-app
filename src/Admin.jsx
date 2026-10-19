@@ -20,6 +20,7 @@ import { api } from "./api.js";
 import { Field } from "./App.jsx";
 import "./admin.css";
 import { ThemeSwitch } from "./Theme.jsx";
+import RoomCodeInput from "./RoomCodeInput.jsx";
 
 function Step({
   number,
@@ -79,6 +80,7 @@ export default function Admin({
     [token, setToken] = useState("");
   const [code, setCode] = useState(""),
     [roomPassword, setRoomPassword] = useState("");
+  const [readingQr, setReadingQr] = useState(false);
   const authenticated = !!state.admin?.authenticated;
   const operation = useRef(0);
   const previouslyAuthenticated = useRef(authenticated);
@@ -246,7 +248,7 @@ export default function Admin({
           )}
           <div className="admin-gate-footer">
             <ShieldCheck size={16} />
-            <span>仅当前浏览器获得管理权限 · 认证有效 8 小时</span>
+            <span>认证有效 {state.admin.sessionHours % 24 === 0 ? `${state.admin.sessionHours / 24} 天` : `${state.admin.sessionHours} 小时`}</span>
           </div>
           <button
             className="subtle full"
@@ -288,7 +290,9 @@ export default function Admin({
             </span>
             <span>
               有效至{" "}
-              {new Date(state.admin.expiresAt).toLocaleTimeString("zh-CN", {
+              {new Date(state.admin.expiresAt).toLocaleString("zh-CN", {
+                month: "numeric",
+                day: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -530,6 +534,7 @@ export default function Admin({
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
+                    if (readingQr) return;
                     const r = await command(
                       "room/join",
                       { code, password: roomPassword },
@@ -541,16 +546,8 @@ export default function Admin({
                     }
                   }}
                 >
-                  <Field label="远程码或邀请链接">
-                    <input
-                      placeholder="粘贴官方 App 的远程房间邀请"
-                      autoComplete="off"
-                      value={code}
-                      required
-                      disabled={disabled || !state.user || state.demo}
-                      onChange={(e) => setCode(e.target.value)}
-                    />
-                  </Field>
+                  <RoomCodeInput value={code} onChange={setCode} onBusy={setReadingQr}
+                    disabled={disabled || !state.user || state.demo || openStep !== 2} />
                   <Field label="房间密码（可选）">
                     <input
                       type="password"
@@ -563,7 +560,7 @@ export default function Admin({
                   <button
                     className="primary full"
                     disabled={
-                      disabled || !state.user || state.demo || !code.trim()
+                      disabled || readingQr || !state.user || state.demo || !code.trim()
                     }
                   >
                     {busy === "room/join" ? "正在加入房间…" : "加入房间"}

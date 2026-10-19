@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: panel
-          image: ghcr.io/rc-chn/dg-lab-web-app:sha-55ddf0d0b81c723105e807f61f471ad3e1feb845
+          image: ghcr.io/rc-chn/dg-lab-web-app:v1.9.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

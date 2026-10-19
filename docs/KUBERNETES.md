@@ -1,6 +1,6 @@
 # Kubernetes / K3s 部署
 
-`deploy/kubernetes` 提供 Kustomize 基础清单：单副本 Deployment、ClusterIP Service、配置与命名空间。镜像固定到已验证的提交，管理员口令通过独立 Secret 注入。
+`deploy/kubernetes` 提供 Kustomize 基础清单：单副本 Deployment、ClusterIP Service、配置与命名空间。镜像固定到已验证的提交，管理员口令通过独立 Secret 注入。ConfigMap 的 `ADMIN_SESSION_HOURS` 默认 168（7 天）。
 
 ## 准备与部署
 
@@ -14,7 +14,7 @@ resources:
 images:
   - name: ghcr.io/rc-chn/dg-lab-web-app
     newName: harbor.example.com/ghcr/rc-chn/dg-lab-web-app
-    newTag: sha-55ddf0d0b81c723105e807f61f471ad3e1feb845
+    newTag: v1.9.0
 patches:
   - target:
       kind: ConfigMap
@@ -53,7 +53,7 @@ kubectl -n dg-lab-web-app logs deployment/dg-lab-web-app --tail=30
 curl --fail https://panel.example.com/healthz
 ```
 
-健康响应为 `{"ok":true}`。再通过 `/admin` 验证管理员认证，控制台可用隔离演示测试播放与停止，无需登录官方账号或连接设备。
+健康响应包含 `ok: true` 和当前 `version`。再通过 `/admin` 验证管理员认证，控制台可用隔离演示测试播放与停止，无需登录官方账号或连接设备。
 
 升级时修改 overlay 的镜像标签或 digest，再执行 dry-run、apply 和 rollout status。回滚用 `kubectl -n dg-lab-web-app rollout undo deployment/dg-lab-web-app`，并将 overlay 改回原镜像，避免下次 apply 再覆盖。
 

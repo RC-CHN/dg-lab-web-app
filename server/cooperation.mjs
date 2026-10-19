@@ -125,6 +125,8 @@ export class Cooperation {
     return [...this.invites.values()]
       .filter((i) => i.owner === owner && this.valid(i))
       .map((i) => ({
+        token: i.token,
+        deviceId: i.deviceId,
         role: i.role,
         expires: i.expires,
         claimed: !!i.guest,

@@ -7,7 +7,7 @@ import { DgApi, ApiError, parseRoomCode } from "./dg-api.mjs";
 import { Room } from "./room.mjs";
 import { Cooperation } from "./cooperation.mjs";
 import { DemoRoom } from "./demo.mjs";
-import { AdminAuth } from "./admin-auth.mjs";
+import { AdminAuth, adminSessionTtl } from "./admin-auth.mjs";
 import { generateV2, makeCustomPulse } from "../shared/pulse-v2.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -22,17 +22,18 @@ export const presets = source.presets.map((p) => ({
   official: true,
 }));
 const origin = process.env.APP_ORIGIN || "";
-const ttl = 24 * 60 * 60 * 1000;
+const { version } = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
 const random = () => randomBytes(24).toString("base64url");
 
 export function createApp({
   roomFactory = (api) => new Room(api),
   apiFactory = () => new DgApi(),
   adminPassword = process.env.ADMIN_PASSWORD || "",
-  adminTtlMs = 8 * 60 * 60 * 1000,
+  adminTtlMs = adminSessionTtl(),
   offlineGraceMs = 15000,
 } = {}) {
   const app = express();
+  const ttl = Math.max(24 * 60 * 60 * 1000, adminTtlMs);
   app.disable("x-powered-by");
   const coop = new Cooperation(),
     auth = new AdminAuth(adminPassword);
@@ -100,6 +101,7 @@ export function createApp({
       admin: {
         configured: auth.configured,
         authenticated: isAdmin(s),
+        sessionHours: adminTtlMs / 3600000,
         expiresAt: isAdmin(s) ? s.adminExpiresAt : null,
       },
     };
@@ -212,8 +214,13 @@ export function createApp({
     s.room.on("change", s.emit);
     sessions.set(s.id, s);
     if (admin) {
-      s.adminTimer = setTimeout(() => dispose(s), adminTtlMs);
-      s.adminTimer.unref();
+      const expire = () => {
+        const remaining = s.adminExpiresAt - Date.now();
+        if (remaining <= 0) { dispose(s); return; }
+        s.adminTimer = setTimeout(expire, Math.min(remaining, 2147483647));
+        s.adminTimer.unref();
+      };
+      expire();
     }
     res.cookie("dgpanel", s.id, {
       httpOnly: true,
@@ -232,7 +239,7 @@ export function createApp({
     if (req.path.startsWith("/api/")) res.set("Cache-Control", "no-store");
     next();
   });
-  app.get("/healthz", (req, res) => res.json({ ok: true }));
+  app.get("/healthz", (req, res) => res.json({ ok: true, version }));
   app.use("/api", (req, res, next) => {
     const cookie = req.headers.cookie
       ?.split(";")

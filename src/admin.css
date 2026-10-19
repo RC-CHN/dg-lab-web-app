@@ -5,6 +5,9 @@
   color: var(--text, #e9ede8);
   padding: 0 28px 40px;
 }
+.room-qr-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.room-qr-message { font-size: 12px; color: var(--muted); margin: 8px 0 14px; }
+.room-qr-message.error { color: var(--danger, #e96e63); }
 .admin-header {
   max-width: 1100px;
   margin: auto;

@@ -153,12 +153,40 @@ try {
     value: true,
   });
   await expect(dialog.getByText("设备已暂停", { exact: true })).toBeVisible();
+  await expect(page.locator(".scope-mini-a")).toHaveText("A 暂停");
+  const lanePixels = (lane) => page.locator(".scope-mini-screen canvas").evaluate((el, lane) => {
+    const context = el.getContext("2d");
+    return Array.from(context.getImageData(0, Math.floor(el.height * lane / 2), el.width, Math.floor(el.height / 2)).data);
+  }, lane);
+  const pausedA = await canvas.evaluate(el => el.toDataURL());
+  const miniA = await lanePixels(0), miniB = await lanePixels(1);
+  const progressA = await dialog.locator("progress").first().getAttribute("value");
+  await page.waitForTimeout(800);
+  assert.equal(await canvas.evaluate(el => el.toDataURL()), pausedA, "paused A detail must freeze");
+  assert.deepEqual(await lanePixels(0), miniA, "paused A dock lane must freeze");
+  assert.notDeepEqual(await lanePixels(1), miniB, "B must continue while A is paused");
+  assert.equal(await dialog.locator("progress").first().getAttribute("value"), progressA);
   await post(context, "control", {
     id: 0,
     channel: 0,
     action: "mute",
     value: false,
   });
+  await expect(page.locator(".scope-mini-a")).not.toHaveText("A 暂停");
+  await page.waitForTimeout(400);
+  assert.notEqual(await canvas.evaluate(el => el.toDataURL()), pausedA, "A must resume the live timeline");
+  await post(context, "control", { id: 0, channel: 1, action: "mute", value: true });
+  await expect(page.locator(".scope-mini-b")).toHaveText("B 暂停");
+  const pausedB = await lanePixels(1), runningA = await lanePixels(0);
+  await page.waitForTimeout(500);
+  assert.deepEqual(await lanePixels(1), pausedB);
+  assert.notDeepEqual(await lanePixels(0), runningA);
+  await post(context, "control", { id: 0, channel: 0, action: "mute", value: true });
+  await expect(page.locator(".scope-mini-job")).toHaveText("双通道已暂停");
+  const bothPaused = await page.locator(".scope-mini-screen canvas").evaluate(el => el.toDataURL());
+  await page.waitForTimeout(500);
+  assert.equal(await page.locator(".scope-mini-screen canvas").evaluate(el => el.toDataURL()), bothPaused);
+  for (const channel of [0, 1]) await post(context, "control", { id: 0, channel, action: "mute", value: false });
   for (const [id, label] of [
     ["arcade", "暗黑街机"],
     ["retro", "复古音响"],

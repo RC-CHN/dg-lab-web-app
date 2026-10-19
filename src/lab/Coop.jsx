@@ -6,11 +6,10 @@ import { Slider } from "./common.jsx";
 import { api } from "../api.js";
 
 export function Invitation({ device, state, run, notify, role }) {
-  const [minutes, setMinutes] = useState(30),
-    [invite, setInvite] = useState(null);
-  const entry = state.cooperation?.find((i) => i.role === role);
-  const url = invite
-    ? `${location.origin}${location.pathname}#invite=${invite.token}`
+  const [minutes, setMinutes] = useState(30), [pending, setPending] = useState(false);
+  const entry = state.cooperation?.find((i) => i.role === role && i.deviceId === device?.id);
+  const url = entry?.token
+    ? `${location.origin}/#invite=${entry.token}`
     : "";
   return (
     <div className="invite-box">
@@ -43,14 +42,11 @@ export function Invitation({ device, state, run, notify, role }) {
         </Field>
         <div className="lab-buttons">
           <button
-            disabled={!device?.connected}
+            disabled={!device?.connected || pending}
             onClick={async () => {
-              const r = await run("coop/create", {
-                id: device.id,
-                role,
-                minutes,
-              });
-              if (r) setInvite(r);
+              setPending(true);
+              try { await run("coop/create", { id: device.id, role, minutes }); }
+              finally { setPending(false); }
             }}
           >
             创建邀请链接
@@ -59,14 +55,13 @@ export function Invitation({ device, state, run, notify, role }) {
             disabled={!state.cooperation?.length}
             onClick={async () => {
               await run("coop/revoke", {});
-              setInvite(null);
             }}
           >
             撤销邀请
           </button>
         </div>
       </div>
-      {invite && entry && (
+      {entry && (
         <div className="invite-url">
           <input
             aria-label="邀请链接"
@@ -88,6 +83,7 @@ export function Invitation({ device, state, run, notify, role }) {
           </button>
         </div>
       )}
+      {entry && <p className="hint">有效至 {new Date(entry.expires).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</p>}
     </div>
   );
 }

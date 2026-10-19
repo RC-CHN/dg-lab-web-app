@@ -4,6 +4,7 @@ import { once } from "node:events";
 import { createApp } from "../server/index.mjs";
 import { Room } from "../server/room.mjs";
 import { ADMIN_PASSWORD, mockApi, MockRoom } from "./fixtures.mjs";
+import { adminSessionTtl } from "../server/admin-auth.mjs";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function fixture(t, options = {}) {
   const rooms = [];
@@ -42,7 +43,7 @@ async function fixture(t, options = {}) {
       });
       const data = await r.json();
       const cookie = r.headers.get("set-cookie");
-      if (cookie) c.cookie = cookie.split(";")[0];
+      if (cookie) { c.cookie = cookie.split(";")[0]; c.cookieHeader = cookie; }
       if (data.csrf) c.csrf = data.csrf;
       return { status: r.status, data };
     };
@@ -443,4 +444,23 @@ test("administrator expiry stops autonomous playback even with no browser page o
   assert.equal(room.players.size, 0);
   assert.equal(room.api.token, null);
   assert.equal(room.info, null);
+});
+
+test("administrator session defaults to seven days with matching cookie and configurable expiry", async (t) => {
+  assert.equal(adminSessionTtl("168"), 7 * 86400000);
+  assert.equal(adminSessionTtl("720"), 30 * 86400000);
+  for (const value of ["0", "721", "no", "1.5"]) assert.throws(() => adminSessionTtl(value));
+  const { client } = await fixture(t), c = await client();
+  const now = Date.now();
+  const result = await c.request("admin/login", { password: ADMIN_PASSWORD });
+  assert.equal(result.data.admin.sessionHours, 168);
+  assert(result.data.admin.expiresAt >= now + 7 * 86400000);
+  assert(result.data.admin.expiresAt < Date.now() + 7 * 86400000 + 1000);
+  assert.match(c.cookieHeader, /Max-Age=604800/);
+  const custom = await fixture(t, { adminTtlMs: adminSessionTtl("720") });
+  const other = await custom.client();
+  await other.request("admin/login", { password: ADMIN_PASSWORD });
+  await sleep(25);
+  assert.equal((await other.request("state")).data.admin.authenticated, true, "30-day timer must not overflow and expire immediately");
+  assert.match(other.cookieHeader, /Max-Age=2592000/);
 });

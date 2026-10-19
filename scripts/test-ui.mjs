@@ -43,6 +43,7 @@ try {
   for (const file of [
     "browser",
     "admin-browser",
+    "qr-browser",
     "lab-browser",
     "ux-browser",
     "theme-browser",

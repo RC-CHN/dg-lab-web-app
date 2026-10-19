@@ -3,6 +3,7 @@ import { Activity, Expand, Radio, Repeat2, Square, X } from "lucide-react";
 import { ThemeSwitch } from "./Theme.jsx";
 import { feedbackPhrases } from "../shared/feedback.mjs";
 import { playbackPhase } from "./PlaybackTiming.jsx";
+import { channelView } from "./scope-display.mjs";
 
 const number = (v) =>
   Number.isFinite(v) ? String(Math.round(v * 100) / 100) : "—";
@@ -17,8 +18,7 @@ const elapsed = (ms) =>
 // Scroll sample timestamps smoothly; do not fabricate sine waves or extrapolate
 // amplitudes. A short display buffer interpolates position between 10 Hz samples.
 export function ScopeCanvas({
-  trace,
-  serverTime,
+  lanes,
   online,
   channel,
   mini = false,
@@ -28,13 +28,12 @@ export function ScopeCanvas({
     latest = useRef({});
   const previous = latest.current;
   latest.current = {
-    trace,
-    serverTime,
+    lanes: lanes.map((lane, c) => ({
+      ...lane,
+      received: previous.lanes?.[c]?.serverTime === lane.serverTime
+        ? previous.lanes[c].received : performance.now(),
+    })),
     online,
-    received:
-      previous.serverTime === serverTime
-        ? previous.received
-        : performance.now(),
   };
   useEffect(() => {
     if (!enabled) return;
@@ -79,14 +78,7 @@ export function ScopeCanvas({
       )
         return;
       lastDraw = stamp;
-      const current = latest.current,
-        samples = current.trace?.samples || [];
-      const now =
-        (current.serverTime || Date.now()) +
-        (current.online
-          ? Math.min(500, performance.now() - current.received)
-          : 0) -
-        200;
+      const current = latest.current;
       ctx.clearRect(0, 0, width, height);
       ctx.lineWidth = 1;
       ctx.strokeStyle = colors[2];
@@ -102,6 +94,9 @@ export function ScopeCanvas({
       ctx.stroke();
       const channels = channel === undefined ? [0, 1] : [channel];
       channels.forEach((c, index) => {
+        const view = current.lanes[c], samples = view.trace?.samples || [];
+        const now = (view.serverTime || Date.now()) +
+          (current.online && !view.paused ? Math.min(500, performance.now() - view.received) : 0) - 200;
         const lane = height / channels.length,
           base = lane * (index + 1) - (mini ? 3 : 12),
           amplitude = lane - (mini ? 7 : 28);
@@ -140,7 +135,7 @@ export function ScopeCanvas({
         ctx.shadowColor = colors[c];
         ctx.shadowBlur = reduce.matches ? 0 : Number(colors[3]) || 0;
         ctx.stroke();
-        if (end && current.online && now - (samples.at(-1)?.[0] || 0) < 600) {
+        if (end && current.online && !view.paused && now - (samples.at(-1)?.[0] || 0) < 600) {
           ctx.beginPath();
           ctx.arc(Math.max(0, end[0]), end[1], mini ? 1.6 : 3, 0, Math.PI * 2);
           ctx.fillStyle = colors[c];
@@ -291,6 +286,18 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
     [inspectId, setInspectId] = useState(null);
   const inspected = state.devices.find((d) => d.id === inspectId) || device;
   const traceFor = (id) => state.scope?.find((s) => s.deviceId === id);
+  const savedViews = useRef(new Map());
+  const views = new Map(state.devices.map(d => {
+    const key = `${d.id}:${d.slotId || ""}`;
+    const previous = savedViews.current.get(key);
+    return [key, [0, 1].map(c => channelView(previous?.[c], {
+      paused: d.slotState?.[c ? "channelB" : "channelA"]?.isMuted === true,
+      trace: traceFor(d.id), job: jobFor(state, d.id, c), serverTime: state.serverTime,
+    }))];
+  }));
+  savedViews.current = views;
+  const viewsFor = d => views.get(`${d?.id}:${d?.slotId || ""}`) || [{}, {}];
+  const deviceViews = viewsFor(device);
   const connected = state.status === "connected";
   const jobs = [0, 1].map((c) => jobFor(state, device?.id, c));
   const label =
@@ -326,8 +333,7 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
         >
           <div className="scope-mini-screen">
             <ScopeCanvas
-              trace={traceFor(device?.id)}
-              serverTime={state.serverTime}
+              lanes={deviceViews}
               online={online && connected}
               mini
             />
@@ -338,22 +344,22 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
           <div className="scope-mini-text">
             <b>
               <span className="scope-mini-a">
-                A {number(device?.props?.intensityA)}
+                A {deviceViews[0].paused ? "暂停" : number(device?.props?.intensityA)}
               </span>
               <span className="scope-mini-b">
-                B {number(device?.props?.intensityB)}
+                B {deviceViews[1].paused ? "暂停" : number(device?.props?.intensityB)}
               </span>
               <Expand size={12} />
             </b>
             <span className="scope-mini-job">
               {!online
                 ? "连接中断 · 状态待同步"
-                : jobs
-                    .map((j) => playbackPhase(j, state.serverTime))
+                : deviceViews.every(v => v.paused) ? "双通道已暂停" : jobs
+                    .map((j, c) => deviceViews[c].paused ? null : playbackPhase(j, state.serverTime))
                     .find(Boolean) || `${loop ? "↻ " : ""}${label}`}
             </span>
             <small>
-              {autonomous ? "后台播放" : active ? "实时输入" : "发送波形"} · 8
+              {deviceViews.every(v => v.paused) ? "显示已暂停" : autonomous ? "后台播放" : active ? "实时输入" : "发送波形"} · 8
               秒轨迹
             </small>
           </div>
@@ -431,19 +437,16 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
           <div className="scope-channels">
             {[0, 1].map((c) => {
               const name = c ? "B" : "A",
-                trace = traceFor(inspected?.id),
-                f = trace?.frames?.[c],
-                job = jobFor(state, inspected?.id, c);
+                view = viewsFor(inspected)[c],
+                f = view.trace?.frames?.[c],
+                job = view.job;
               const known =
                 online &&
                 connected &&
                 inspected?.connected &&
                 inspected?.slotState?.hasDevice !== false;
               const status = channelStatus(inspected, c, online, connected),
-                age =
-                  job?.elapsedMs ??
-                  (state.serverTime || Date.now()) -
-                    (job?.startedAt || Date.now());
+                age = view.age || 0;
               return (
                 <section
                   className={`scope-channel channel-${name.toLowerCase()}`}
@@ -455,7 +458,7 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
                       <div>
                         <b>{job?.label || "未播放波形"}</b>
                         <span>
-                          {playbackPhase(job, state.serverTime) || status}
+                          {view.paused ? status : playbackPhase(job, state.serverTime) || status}
                         </span>
                       </div>
                     </div>
@@ -478,8 +481,7 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
                       <span>0%</span>
                     </div>
                     <ScopeCanvas
-                      trace={trace}
-                      serverTime={state.serverTime}
+                      lanes={viewsFor(inspected)}
                       online={online && connected}
                       channel={c}
                       enabled={open}
@@ -487,13 +489,13 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
                   </div>
                   <div className="scope-measures">
                     <span>
-                      发送幅值 <b>{known ? `${(f?.[2] || 0) * 5}%` : "—"}</b>
+                      {view.paused ? "暂停时幅值" : "发送幅值"} <b>{known ? `${(f?.[2] || 0) * 5}%` : "—"}</b>
                     </span>
                     <span>
                       周期 <b>{known && f?.[2] ? `${f[0] + f[1]} ms` : "—"}</b>
                     </span>
                     <span>
-                      {job
+                      {view.paused ? "显示已暂停" : job
                         ? job.waiting
                           ? "等待选择 · 静默"
                           : job.autonomous
@@ -511,7 +513,7 @@ export default function PlaybackDock({ state, device, online, run, stop }) {
                           ) : (
                             <Activity size={13} />
                           )}
-                          {job.queueLength
+                          {view.paused ? "已暂停" : job.queueLength
                             ? `第 ${job.index + 1} / ${job.queueLength} 段`
                             : job.loop
                               ? "片段循环"

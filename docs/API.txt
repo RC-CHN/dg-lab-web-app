@@ -12,7 +12,7 @@ GET /api/state             admin:{configured,authenticated,expiresAt} / user/dem
 GET /api/events            SSE，同 /api/state 的实时状态；后台任务不依赖此连接续期
 GET /api/presets           24 个内置波形（id/name/content/frames/official）
 
-POST /api/admin/login      {password} 面板管理员口令，返回完整state；有效8小时
+POST /api/admin/login      {password} 面板管理员口令，返回完整state；默认有效7天（ADMIN_SESSION_HOURS 可配置）
 POST /api/admin/logout     {} 立即撤权、停止、断开房间并撤销邀请，返回新的匿名state
 
 POST /api/login            {phone,password,phoneCountryCode:"86"} 或 {email,password} 或 {token}

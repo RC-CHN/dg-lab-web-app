@@ -34,6 +34,8 @@ tests/fixtures/v2-golden.json
   generator against synthetic inputs. No APK executable code is in this file.
 
 Dependencies
+  Browser QR decoding uses jsQR 1.4.0 (Apache-2.0),
+  https://github.com/cozmo/jsQR; its license is retained in vendor/jsqr.LICENSE.
   NPM dependency versions and their source locations are in package-lock.json;
   their own licenses apply. npm ci installs their original license notices.
   Third-party logos, screenshots, the APK and the full decompiled application

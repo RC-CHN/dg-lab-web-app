@@ -3,6 +3,12 @@ import { promisify } from "node:util";
 import { ApiError } from "./dg-api.mjs";
 
 const derive = promisify(scrypt);
+export function adminSessionTtl(hours = process.env.ADMIN_SESSION_HOURS || "168") {
+  const value = Number(hours);
+  if (!Number.isInteger(value) || value < 1 || value > 720)
+    throw new Error("ADMIN_SESSION_HOURS 必须是 1 到 720 的整数");
+  return value * 60 * 60 * 1000;
+}
 export class AdminAuth {
   constructor(password = "") {
     this.configured =

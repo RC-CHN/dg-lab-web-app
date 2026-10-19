@@ -29,6 +29,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - run: npm run check:version
       - name: Check public files and scan all Git history
         shell: bash
         run: |
@@ -63,6 +64,9 @@ jobs:
     if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+      digest: ${{ steps.build.outputs.digest }}
     permissions:
       contents: read
       packages: write
@@ -93,6 +97,7 @@ jobs:
             type=ref,event=tag
           flavor: latest=false
       - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        id: build
         with:
           context: .
           push: true
@@ -101,3 +106,36 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  release:
+    name: Publish versioned release
+    needs: [validate, publish]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Publish notes and checksummed source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_IMAGE: ${{ needs.publish.outputs.image }}
+          RELEASE_DIGEST: ${{ needs.publish.outputs.digest }}
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" --name "source-$GITHUB_SHA" --dir artifacts
+          node --input-type=module <<'NODE' > "$RUNNER_TEMP/release.md"
+          import fs from 'node:fs';
+          const {version} = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const log = fs.readFileSync('CHANGELOG.md', 'utf8');
+          const section = log.split('## ' + version + ' — ')[1].split('\n## ')[0];
+          process.stdout.write(section.slice(section.indexOf('\n') + 1).trim() + '\n');
+          NODE
+          # shellcheck disable=SC2016
+          printf '\n镜像：`%s:%s@%s`（linux/amd64、linux/arm64）。\n' "$RELEASE_IMAGE" "$RELEASE_TAG" "$RELEASE_DIGEST" >> "$RUNNER_TEMP/release.md"
+          gh release create "$RELEASE_TAG" --verify-tag --title "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release.md" artifacts/*

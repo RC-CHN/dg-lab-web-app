@@ -25,6 +25,7 @@ import {
   Shield,
   CircleHelp,
   CircleUserRound,
+  Users,
 } from "lucide-react";
 import { api, rememberState, localId } from "./api.js";
 import Touch from "./Touch.jsx";
@@ -411,7 +412,7 @@ export default function App() {
             {state.demo ? "退出演示模式" : "探索演示模式"}
             <ArrowUpRight size={14} />
           </button>
-          <span className="version">WEB PANEL / 01</span>
+          <span className="version">WEB PANEL / v{__APP_VERSION__}</span>
         </div>
       </aside>
       <div className="workspace">
@@ -434,6 +435,9 @@ export default function App() {
                 {state.admin?.authenticated ? "连接管理" : "管理员入口"}
               </span>
             </button>
+            {device?.connected && <button className="invite-shortcut" aria-label="邀请协作" title="邀请协作" disabled={!online} onClick={() => setTab("coop")}>
+              <Users size={18} /><span>邀请协作</span>
+            </button>}
           </div>
         </header>
         {!online && (
@@ -860,7 +864,7 @@ export default function App() {
                         <div>
                           <b>{experiment?.label || p?.label || "未播放波形"}</b>
                           <small>
-                            {experiment
+                            {device?.slotState?.[c ? "channelB" : "channelA"]?.isMuted ? "输出已暂停" : experiment
                               ? experiment.waiting
                                 ? "等待场景选择 · 当前静默"
                                 : `实验室 · ${(experiment.tick / 10).toFixed(1)} 秒`
@@ -871,7 +875,7 @@ export default function App() {
                           </small>
                         </div>
                         <span
-                          className={`status-dot ${p || experiment ? "green" : ""}`}
+                          className={`status-dot ${(p || experiment) && !device?.slotState?.[c ? "channelB" : "channelA"]?.isMuted ? "green" : ""}`}
                         />
                       </div>
                     );
@@ -887,7 +891,7 @@ export default function App() {
           )}
           <footer>
             <span>DG-LAB REMOTE CONSOLE</span>
-            <span>非官方 Web 客户端 · 自托管</span>
+            <span>v{__APP_VERSION__} · 非官方 Web 客户端 · 自托管</span>
           </footer>
         </main>
         {dock}

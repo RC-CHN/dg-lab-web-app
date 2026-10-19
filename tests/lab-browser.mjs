@@ -134,11 +134,17 @@ try {
     (s) => s.lab.node === 1 && !s.lab.waiting,
     "branch choice did not advance",
   );
-  await choose(page, "双人协作");
+  await page.getByRole("button", { name: "邀请协作", exact: true }).click();
   await page.getByRole("button", { name: "创建邀请链接", exact: true }).click();
   const invite = await page
     .getByLabel("邀请链接", { exact: true })
     .inputValue();
+  await choose(page, "通道控制");
+  await page.getByRole("button", { name: "邀请协作", exact: true }).click();
+  await expect(page.getByLabel("邀请链接", { exact: true })).toHaveValue(invite);
+  await page.reload();
+  await page.getByRole("button", { name: "邀请协作", exact: true }).click();
+  await expect(page.getByLabel("邀请链接", { exact: true })).toHaveValue(invite);
   const guest = await browser.newPage({
     viewport: { width: 390, height: 844 },
     isMobile: true,

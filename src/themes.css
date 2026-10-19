@@ -1520,3 +1520,5 @@
   border-color: #4b627c;
   border-radius: 3px;
 }
+.invite-shortcut { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; }
+@media (max-width: 600px) { .invite-shortcut { order: 4; min-width: 44px; padding: 8px; justify-content: center; } .invite-shortcut span { display: none; } }
