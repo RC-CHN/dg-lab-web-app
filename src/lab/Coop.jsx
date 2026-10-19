@@ -4,13 +4,27 @@ import { Users, Copy, Link2, Play, Square, LogOut } from "lucide-react";
 import { Field, Num, Wave } from "../App.jsx";
 import { Slider } from "./common.jsx";
 import { api } from "../api.js";
+import { coopRole } from "../../shared/lab.mjs";
+import {
+  MultiInvitation,
+  VectorControls,
+  VectorSummary,
+} from "./VectorCoop.jsx";
 
-export function Invitation({ device, state, run, notify, role }) {
-  const [minutes, setMinutes] = useState(30), [pending, setPending] = useState(false);
-  const entry = state.cooperation?.find((i) => i.role === role && i.deviceId === device?.id);
-  const url = entry?.token
-    ? `${location.origin}/#invite=${entry.token}`
-    : "";
+export function Invitation(props) {
+  return props.role === "vector" ? (
+    <MultiInvitation {...props} />
+  ) : (
+    <SingleInvitation {...props} />
+  );
+}
+function SingleInvitation({ device, state, run, notify, role }) {
+  const [minutes, setMinutes] = useState(30),
+    [pending, setPending] = useState(false);
+  const entry = state.cooperation?.find(
+    (i) => i.role === role && i.deviceId === device?.id,
+  );
+  const url = entry?.token ? `${location.origin}/#invite=${entry.token}` : "";
   return (
     <div className="invite-box">
       <div className="section-heading">
@@ -45,8 +59,11 @@ export function Invitation({ device, state, run, notify, role }) {
             disabled={!device?.connected || pending}
             onClick={async () => {
               setPending(true);
-              try { await run("coop/create", { id: device.id, role, minutes }); }
-              finally { setPending(false); }
+              try {
+                await run("coop/create", { id: device.id, role, minutes });
+              } finally {
+                setPending(false);
+              }
             }}
           >
             创建邀请链接
@@ -83,29 +100,95 @@ export function Invitation({ device, state, run, notify, role }) {
           </button>
         </div>
       )}
-      {entry && <p className="hint">有效至 {new Date(entry.expires).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</p>}
+      {entry && (
+        <p className="hint">
+          有效至{" "}
+          {new Date(entry.expires).toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </p>
+      )}
     </div>
   );
 }
 export function Coop({ device, state, lab, ready, run, notify }) {
-  const [mode, setMode] = useState("split"),
+  const [mode, setMode] = useState(
+      () =>
+        state.lab?.coopMode ||
+        (state.cooperation?.some((i) => i.role === "amplitude")
+          ? "split"
+          : state.cooperation?.some((i) => i.role === "channelB")
+            ? "channels"
+            : "vector"),
+    ),
     [period, setPeriod] = useState(40),
+    [contribution, setContribution] = useState({
+      amplitudeA: 0,
+      amplitudeB: 0,
+    }),
+    [capA, setCapA] = useState(100),
+    [capB, setCapB] = useState(100),
     [amplitude, setAmplitude] = useState(50),
     [bpm, setBpm] = useState(80),
     [swapSeconds, setSwapSeconds] = useState(0);
-  const input = mode === "split" ? { period, bpm } : { period, amplitude };
+  const input =
+    mode === "vector"
+      ? { ...contribution, period, capA, capB }
+      : mode === "split"
+        ? { period, bpm }
+        : { period, amplitude };
   useEffect(() => {
     lab.patch.current = { input };
-  }, [mode, period, amplitude, bpm]);
-  const role = mode === "split" ? "amplitude" : "channelB",
-    guest = state.cooperation?.find((i) => i.role === role);
+  }, [mode, period, amplitude, bpm, contribution, capA, capB]);
+  const role = coopRole(mode),
+    guest = state.cooperation?.find(
+      (i) => i.role === role && i.deviceId === device?.id && i.online,
+    ),
+    vectorRunning = state.lab?.running && state.lab?.coopMode === "vector";
+  const startButton = (
+    <div className="lab-buttons">
+      <button
+        className="primary"
+        disabled={
+          !ready ||
+          lab.pending ||
+          !guest?.online ||
+          (mode === "vector" && vectorRunning)
+        }
+        onClick={async () => {
+          if (
+            await lab.start({
+              mode: "coop",
+              label: mode === "vector" ? "多人叠加" : "双人协作",
+              coopMode: mode,
+              period,
+              capA,
+              capB,
+              swapSeconds,
+              duration: 1800,
+            })
+          ) {
+            lab.patch.current = { input };
+          }
+        }}
+      >
+        <Play size={15} />{" "}
+        {mode === "vector"
+          ? vectorRunning
+            ? "叠加运行中"
+            : "开始多人叠加"
+          : "开始双人协作"}
+      </button>
+    </div>
+  );
   return (
     <section className="panel">
       <div className="section-heading">
         <h2>
-          <Users size={18} /> 双人协作
+          <Users size={18} /> 多人协作
         </h2>
-        <span className="section-tag">DUET</span>
+        <span className="section-tag">PARTY / A+B</span>
       </div>
       <Field label="合作方式">
         <select
@@ -115,10 +198,50 @@ export function Coop({ device, state, lab, ready, run, notify }) {
             setMode(e.target.value);
           }}
         >
-          <option value="split">我控制节奏，对方控制幅值</option>
+          <option value="vector">多人叠加 · A/B 分路累加</option>
+          <option value="split">双人分工 · 我管节奏，对方管幅值</option>
           <option value="channels">各控制一轨，可定时交换</option>
         </select>
       </Field>
+      {mode === "vector" && (
+        <>
+          <VectorSummary
+            vector={vectorRunning ? state.lab.vector : { capA, capB }}
+            running={vectorRunning}
+          />
+          <VectorControls value={contribution} onChange={setContribution} />
+          <details className="vector-settings">
+            <summary>
+              合成设置 · 上限 A {capA}% / B {capB}%
+            </summary>
+            <div className="play-settings">
+              <Slider
+                label="A 路合成上限"
+                value={capA}
+                onChange={setCapA}
+                unit="%"
+                step={5}
+              />
+              <Slider
+                label="B 路合成上限"
+                value={capB}
+                onChange={setCapB}
+                unit="%"
+                step={5}
+              />
+            </div>
+            <Slider
+              label="共同周期"
+              value={period}
+              onChange={setPeriod}
+              min={10}
+              max={100}
+              unit="ms"
+            />
+          </details>
+        </>
+      )}
+      {mode === "vector" && startButton}
       <Invitation
         device={device}
         state={state}
@@ -126,28 +249,30 @@ export function Coop({ device, state, lab, ready, run, notify }) {
         notify={notify}
         role={role}
       />
-      <div className="play-settings">
-        <Slider
-          label="我的周期"
-          value={period}
-          onChange={setPeriod}
-          min={10}
-          max={100}
-          unit="ms"
-        />
-        {mode === "split" ? (
-          <Field label="我的 BPM">
-            <Num value={bpm} onChange={setBpm} min={30} max={200} />
-          </Field>
-        ) : (
+      {mode !== "vector" && (
+        <div className="play-settings">
           <Slider
-            label="我的波形幅值"
-            value={amplitude}
-            onChange={setAmplitude}
-            unit="%"
+            label="我的周期"
+            value={period}
+            onChange={setPeriod}
+            min={10}
+            max={100}
+            unit="ms"
           />
-        )}
-      </div>
+          {mode === "split" ? (
+            <Field label="我的 BPM">
+              <Num value={bpm} onChange={setBpm} min={30} max={200} />
+            </Field>
+          ) : (
+            <Slider
+              label="我的波形幅值"
+              value={amplitude}
+              onChange={setAmplitude}
+              unit="%"
+            />
+          )}
+        </div>
+      )}
       {mode === "channels" && (
         <Field label="自动交换 A/B">
           <select
@@ -163,28 +288,12 @@ export function Coop({ device, state, lab, ready, run, notify }) {
           </select>
         </Field>
       )}
-      <div className="lab-buttons">
-        <button
-          className="primary"
-          disabled={!ready || lab.pending || !guest?.online}
-          onClick={async () => {
-            if (
-              await lab.start({
-                mode: "coop",
-                label: "双人协作",
-                coopMode: mode,
-                swapSeconds,
-                duration: 1800,
-              })
-            ) {
-              lab.patch.current = { input };
-            }
-          }}
-        >
-          <Play size={15} /> 开始双人协作
-        </button>
-      </div>
-      <p className="hint">双方在线后可开始；离线即停止。</p>
+      {mode !== "vector" && startButton}
+      <p className="hint">
+        {mode === "vector"
+          ? "各路分别相加，达到上限封顶；玩家离线撤掉其贡献。"
+          : "双方在线后可开始；离线即停止。"}
+      </p>
     </section>
   );
 }
@@ -223,11 +332,22 @@ export default function Guest({ state, token, onExit, notify, online }) {
     [error, setError] = useState(""),
     [pending, setPending] = useState(false),
     [amplitude, setAmplitude] = useState(0),
+    [contribution, setContribution] = useState({
+      amplitudeA: 0,
+      amplitudeB: 0,
+    }),
     [period, setPeriod] = useState(40);
   const guest = state.guest,
     current = useRef({}),
     sequence = useRef({ runId: null, seq: 0 });
-  current.current = { guest, amplitude, period, online };
+  current.current = { guest, amplitude, period, online, contribution };
+  const nextSequence = (g) => {
+    if (sequence.current.runId !== g.lab.runId)
+      sequence.current = { runId: g.lab.runId, seq: -1 };
+    sequence.current.seq =
+      Math.max(sequence.current.seq, g.inputSequence ?? -1) + 1;
+    return sequence.current.seq;
+  };
   useEffect(() => {
     if (!token || !state.csrf || guest) return;
     api("coop/inspect", { token })
@@ -243,21 +363,26 @@ export default function Guest({ state, token, onExit, notify, online }) {
         return;
       busy = true;
       try {
-        if (!g.lab?.running || g.lab.mode !== "coop" || g.role === "choice")
+        if (
+          !g.lab?.running ||
+          g.lab.mode !== "coop" ||
+          g.role !== coopRole(g.lab.coopMode)
+        )
           await api("coop/heartbeat", {});
         else {
-          if (sequence.current.runId !== g.lab.runId)
-            sequence.current = { runId: g.lab.runId, seq: 0 };
           await api("coop/input", {
             runId: g.lab.runId,
             epoch: g.lab.epoch,
-            seq: ++sequence.current.seq,
+            seq: nextSequence(g),
             input:
-              g.role === "amplitude"
-                ? { amplitude: c.amplitude }
-                : { amplitude: c.amplitude, period: c.period },
+              g.role === "vector"
+                ? c.contribution
+                : g.role === "amplitude"
+                  ? { amplitude: c.amplitude }
+                  : { amplitude: c.amplitude, period: c.period },
           });
         }
+        setError("");
       } catch (e) {
         setError(e.message);
       } finally {
@@ -265,8 +390,20 @@ export default function Guest({ state, token, onExit, notify, online }) {
       }
     }, 250);
     const stop = () => {
-      const r = current.current.guest?.lab;
-      if (r?.running)
+      const g = current.current.guest,
+        r = g?.lab;
+      if (g?.role === "vector") {
+        const zero = { amplitudeA: 0, amplitudeB: 0 };
+        current.current.contribution = zero;
+        setContribution(zero);
+        if (r?.running && r.coopMode === "vector")
+          api("coop/input", {
+            runId: r.runId,
+            epoch: r.epoch,
+            seq: nextSequence(g),
+            input: zero,
+          }).catch(() => {});
+      } else if (r?.running)
         api("coop/stop", { runId: r.runId, epoch: r.epoch }).catch(() => {});
     };
     const hide = () => {
@@ -296,7 +433,7 @@ export default function Guest({ state, token, onExit, notify, online }) {
       <div className="brand">
         <Users size={27} />
         <span>
-          DG-LAB<small>DUET / 协作终端</small>
+          DG-LAB<small>PARTY / 协作终端</small>
         </span>
       </div>
       <section className="panel">
@@ -306,7 +443,7 @@ export default function Guest({ state, token, onExit, notify, online }) {
           <>
             <p className="muted">
               {preview
-                ? `你的权限：${{ amplitude: "波形幅值", channelB: "单轨波形控制", choice: "互动场景选择" }[preview.role]}`
+                ? `你的权限：${{ amplitude: "波形幅值", channelB: "单轨波形控制", choice: "互动场景选择", vector: "A/B 两路幅值贡献" }[preview.role]}`
                 : "正在读取邀请…"}
             </p>
             {preview?.demo && (
@@ -361,7 +498,23 @@ export default function Guest({ state, token, onExit, notify, online }) {
                 {guest.lab?.running ? "实验进行中" : "等待主面板开始"}
               </span>
             </div>
-            {guest.role !== "choice" && (
+            {guest.role === "vector" && (
+              <>
+                <p className="muted">{guest.name}</p>
+                <VectorSummary
+                  vector={guest.lab?.vector}
+                  running={
+                    guest.lab?.running && guest.lab?.coopMode === "vector"
+                  }
+                  selfId={guest.participantId}
+                />
+                <VectorControls
+                  value={contribution}
+                  onChange={setContribution}
+                />
+              </>
+            )}
+            {!["choice", "vector"].includes(guest.role) && (
               <>
                 <Slider
                   label="我的波形幅值"
@@ -407,7 +560,8 @@ export default function Guest({ state, token, onExit, notify, online }) {
                   !guest.lab?.running ||
                   (guest.role === "choice"
                     ? guest.lab.mode !== "scene"
-                    : guest.lab.mode !== "coop")
+                    : guest.lab.mode !== "coop" ||
+                      guest.role !== coopRole(guest.lab.coopMode))
                 }
                 onClick={() =>
                   action("coop/stop", {

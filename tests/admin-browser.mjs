@@ -145,7 +145,10 @@ try {
   await expect(
     page.getByRole("button", { name: "接管设备", exact: true }),
   ).toHaveCount(0);
-  await chooseFeature(page, "双人协作");
+  await chooseFeature(page, "多人协作");
+  await page
+    .getByRole("combobox", { name: "合作方式", exact: true })
+    .selectOption("split");
   await page.getByRole("button", { name: "创建邀请链接", exact: true }).click();
   const url = await page.getByLabel("邀请链接", { exact: true }).inputValue();
   const guest = await browser.newPage({

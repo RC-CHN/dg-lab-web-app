@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { ApiError } from "./dg-api.mjs";
+import { COOP_GUEST_LIMIT, coopRole } from "../shared/lab.mjs";
 
 export class Cooperation {
   constructor() {
@@ -21,20 +22,37 @@ export class Cooperation {
       d.slotId === invite.slotId
     );
   }
-  create(owner, { id, role = "amplitude", minutes = 30 }) {
+  create(owner, { id, role = "amplitude", minutes = 30, name = "" }) {
     const d = owner.room.device(id);
     if (!owner.clients.size) throw new ApiError("请保持主面板在线", 409);
     if (
-      !["amplitude", "channelB", "choice"].includes(role) ||
+      !["amplitude", "channelB", "choice", "vector"].includes(role) ||
+      typeof name !== "string" ||
+      name.trim().length > 24 ||
       !Number.isInteger(minutes) ||
       minutes < 1 ||
       minutes > 60
     )
       throw new ApiError("邀请参数无效");
-    this.revoke(owner);
+    if (role !== "vector") this.revoke(owner);
+    else {
+      for (const i of [...this.invites.values()])
+        if (i.owner === owner && (i.role !== "vector" || !this.valid(i)))
+          this.invalidate(i);
+      if (this.ownerState(owner).length >= COOP_GUEST_LIMIT)
+        throw new ApiError(
+          `最多邀请 ${COOP_GUEST_LIMIT} 位协作者，请先移除一个邀请`,
+          409,
+        );
+    }
+    const names = new Set(this.ownerState(owner).map((i) => i.name));
+    let index = 1;
+    while (names.has(`玩家 ${index}`)) index++;
     const token = randomBytes(32).toString("base64url");
     const invite = {
       token,
+      id: randomBytes(8).toString("hex"),
+      name: name.trim() || `玩家 ${index}`,
       owner,
       room: owner.room,
       roomId: owner.room.info?.id,
@@ -52,13 +70,20 @@ export class Cooperation {
     );
     invite.timer.unref();
     this.invites.set(token, invite);
-    return { token, role, expires: invite.expires };
+    return {
+      token,
+      id: invite.id,
+      name: invite.name,
+      role,
+      expires: invite.expires,
+    };
   }
   inspect(token) {
     const invite = this.invites.get(String(token));
     if (!this.valid(invite)) throw new ApiError("邀请已过期或已撤销", 410);
     return {
       role: invite.role,
+      name: invite.name,
       expires: invite.expires,
       demo: invite.owner.demo,
       claimed: !!invite.guest,
@@ -85,7 +110,12 @@ export class Cooperation {
     i.revoked = true;
     clearTimeout(i.timer);
     this.invites.delete(i.token);
-    if (i.room.lab.run?.mode === "coop" || i.room.lab.run?.mode === "scene")
+    const r = i.room.lab.run;
+    if (r?.mode === "coop" && r.coopMode === "vector") {
+      i.room.lab.removeContributor(i.id);
+      if (!this.guard(i.owner, "coop", r.id, "vector"))
+        i.room.lab.stop(true, reason);
+    } else if (r?.mode === "coop" || r?.mode === "scene")
       i.room.lab.stop(true, reason);
     if (i.guest) {
       i.guest.guestReason = reason;
@@ -93,9 +123,16 @@ export class Cooperation {
     }
     i.owner.emit();
   }
-  revoke(owner) {
+  revoke(owner, id) {
+    if (
+      id !== undefined &&
+      (typeof id !== "string" ||
+        !this.ownerState(owner).some((i) => i.id === id))
+    )
+      throw new ApiError("邀请不存在", 404);
     for (const i of [...this.invites.values()])
-      if (i.owner === owner) this.invalidate(i);
+      if (i.owner === owner && (id === undefined || i.id === id))
+        this.invalidate(i);
   }
   ownerChanged(owner) {
     for (const i of [...this.invites.values()])
@@ -117,8 +154,15 @@ export class Cooperation {
   }
   guestOffline(guest) {
     const i = guest.guest;
-    if (i && this.valid(i) && ["coop", "scene"].includes(i.room.lab.run?.mode))
-      i.room.lab.stop(true, "协作者离线");
+    if (i && this.valid(i)) {
+      const r = i.room.lab.run;
+      if (r?.mode === "coop" && r.coopMode === "vector") {
+        i.room.lab.removeContributor(i.id);
+        if (!this.guard(i.owner, "coop", r.id, "vector"))
+          i.room.lab.stop(true, "协作者已全部离线");
+      } else if (["coop", "scene"].includes(r?.mode))
+        i.room.lab.stop(true, "协作者离线");
+    }
     i?.owner.emit();
   }
   ownerState(owner) {
@@ -126,6 +170,8 @@ export class Cooperation {
       .filter((i) => i.owner === owner && this.valid(i))
       .map((i) => ({
         token: i.token,
+        id: i.id,
+        name: i.name,
         deviceId: i.deviceId,
         role: i.role,
         expires: i.expires,
@@ -141,14 +187,19 @@ export class Cooperation {
     return {
       active: true,
       role: i.role,
+      participantId: i.id,
+      name: i.name,
       expires: i.expires,
       demo: i.owner.demo,
+      inputSequence: i.inputRunId === lab.runId ? i.inputSeq : -1,
       ownerOnline: !!i.owner.clients.size,
       lab: {
         running: lab.running,
         runId: lab.runId,
         epoch: lab.epoch,
         mode: lab.mode,
+        coopMode: lab.coopMode,
+        vector: lab.vector,
         label: lab.label,
         frames: lab.frames,
         waiting: lab.waiting,
@@ -173,14 +224,18 @@ export class Cooperation {
       (i) =>
         i.owner === owner && i.deviceId === Number(deviceId) && this.valid(i),
     );
+    if (mode === "coop" && coopMode === "vector")
+      return (
+        !!owner.clients.size &&
+        invites.some(
+          (i) =>
+            i.role === "vector" &&
+            i.guest?.clients.size &&
+            Date.now() - i.lastSeen < 1500,
+        )
+      );
     const invite = invites.find(
-      (i) =>
-        i.role ===
-        (mode === "scene"
-          ? "choice"
-          : coopMode === "channels"
-            ? "channelB"
-            : "amplitude"),
+      (i) => i.role === (mode === "scene" ? "choice" : coopRole(coopMode)),
     );
     if (mode === "scene" && !invite?.guest) return true;
     return (
@@ -196,9 +251,8 @@ export class Cooperation {
     if (
       r.id !== i.deviceId ||
       r.mode !== "coop" ||
-      i.role === "choice" ||
-      (i.role === "amplitude" && r.coopMode !== "split") ||
-      (i.role === "channelB" && r.coopMode !== "channels")
+      i.role !== coopRole(r.coopMode) ||
+      (i.role === "vector" && !guest.clients.size)
     )
       throw new ApiError("协作角色与当前模式不匹配", 403);
     if (
@@ -213,7 +267,11 @@ export class Cooperation {
     const previous = i.inputRunId === r.runId ? i.inputSeq : -1;
     if (!Number.isSafeInteger(body.seq) || body.seq <= previous)
       throw new ApiError("已忽略过期的协作输入", 409);
-    const result = lab.coopInput("guest", body.input);
+    const result = lab.coopInput(
+      i.role === "vector" ? i.id : "guest",
+      body.input,
+      i.name,
+    );
     i.inputRunId = r.runId;
     i.inputSeq = body.seq;
     i.lastSeen = Date.now();
@@ -232,8 +290,7 @@ export class Cooperation {
     if (
       r.id !== i.deviceId ||
       (i.role === "choice" ? r.mode !== "scene" : r.mode !== "coop") ||
-      (r.mode === "coop" &&
-        i.role !== (r.coopMode === "channels" ? "channelB" : "amplitude"))
+      (r.mode === "coop" && i.role !== coopRole(r.coopMode))
     )
       throw new ApiError("该邀请不能停止当前实验", 403);
     i.room.lab.stop(true, "协作者停止了实验");

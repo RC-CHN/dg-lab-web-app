@@ -8,6 +8,7 @@ import {
   frameOf,
   number,
   clamp,
+  sumContributions,
 } from "../shared/lab.mjs";
 
 export class LabEngine {
@@ -53,6 +54,8 @@ export class LabEngine {
         : null,
       mix: r.mix,
       bpm: r.bpm,
+      coopMode: r.coopMode,
+      vector: r.vector,
       swap:
         r.mode === "coop" && r.swapSeconds
           ? Math.floor(r.tick / (r.swapSeconds * 10)) % 2
@@ -129,12 +132,24 @@ export class LabEngine {
       r.phase = 0;
     }
     if (mode === "coop") {
-      r.coopMode = config.coopMode === "channels" ? "channels" : "split";
+      r.coopMode = config.coopMode ?? "split";
+      if (!["split", "channels", "vector"].includes(r.coopMode))
+        throw new ApiError("协作模式无效");
       r.swapSeconds = number(config.swapSeconds ?? 0, 0, 120);
-      r.inputs = {
-        owner: { amplitude: 50, period: 40, bpm: 80 },
-        guest: { amplitude: 0, period: 40 },
-      };
+      r.inputs =
+        r.coopMode === "vector"
+          ? {
+              owner: { name: "主控", amplitudeA: 0, amplitudeB: 0 },
+            }
+          : {
+              owner: { amplitude: 50, period: 40, bpm: 80 },
+              guest: { amplitude: 0, period: 40 },
+            };
+      if (r.coopMode === "vector") {
+        r.period = number(config.period ?? 40, 10, 100, "周期");
+        r.capA = number(config.capA ?? 100, 0, 100, "A 路幅值上限");
+        r.capB = number(config.capB ?? 100, 0, 100, "B 路幅值上限");
+      }
     }
     if (mode === "scene") {
       if (
@@ -209,15 +224,23 @@ export class LabEngine {
     r.expires = Date.now() + 1200;
     return { ok: true };
   }
-  coopInput(role, input) {
+  coopInput(role, input, name) {
     const r = this.run;
     if (!r || r.mode !== "coop") throw new ApiError("协作尚未开始", 409);
+    if (!input || typeof input !== "object" || Array.isArray(input))
+      throw new ApiError("协作输入无效");
     const fields =
-      r.coopMode === "split"
-        ? role === "owner"
-          ? ["period", "bpm"]
-          : ["amplitude"]
-        : ["period", "amplitude"];
+      r.coopMode === "vector"
+        ? [
+            "amplitudeA",
+            "amplitudeB",
+            ...(role === "owner" ? ["period", "capA", "capB"] : []),
+          ]
+        : r.coopMode === "split"
+          ? role === "owner"
+            ? ["period", "bpm"]
+            : ["amplitude"]
+          : ["period", "amplitude"];
     if (Object.keys(input).some((k) => !fields.includes(k)))
       throw new ApiError("该协作角色无权修改这些参数", 403);
     const values = {};
@@ -225,11 +248,24 @@ export class LabEngine {
       if (input[key] !== undefined)
         values[key] = number(
           input[key],
-          key === "amplitude" ? 0 : key === "bpm" ? 30 : 10,
+          key === "bpm" ? 30 : key === "period" ? 10 : 0,
           key === "bpm" ? 200 : 100,
         );
+    if (r.coopMode === "vector") {
+      for (const key of ["period", "capA", "capB"])
+        if (values[key] !== undefined) {
+          r[key] = values[key];
+          delete values[key];
+        }
+      r.inputs[role] ??= { name, amplitudeA: 0, amplitudeB: 0 };
+      values.updatedAt = Date.now();
+    }
     Object.assign(r.inputs[role], values);
     return { ok: true };
+  }
+  removeContributor(id) {
+    const r = this.run;
+    if (r?.mode === "coop" && r.coopMode === "vector") delete r.inputs[id];
   }
   choose({ runId, epoch, node, revision, choice }) {
     const r = this.check(runId, epoch);
@@ -310,7 +346,29 @@ export class LabEngine {
         r.beat = beat;
         r.phase += r.bpm / 600;
       } else if (r.mode === "coop") {
-        if (r.coopMode === "split") {
+        if (r.coopMode === "vector") {
+          for (const [id, v] of Object.entries(r.inputs))
+            if (id !== "owner" && Date.now() - v.updatedAt >= 1500)
+              delete r.inputs[id];
+          const participants = Object.entries(r.inputs).map(([id, v]) => ({
+            id,
+            name: v.name,
+            amplitudeA: v.amplitudeA,
+            amplitudeB: v.amplitudeB,
+          }));
+          r.vector = {
+            ...sumContributions(participants, r.capA, r.capB),
+            period: r.period,
+            participants,
+          };
+          // V2 amplitude has 21 levels. Round down so even a non-multiple-of-5
+          // cap cannot be exceeded by protocol quantization.
+          pair = [r.vector.amplitudeA, r.vector.amplitudeB].map((v) =>
+            frameOf(r.period, Math.floor(v / 5) * 5),
+          );
+          r.vector.amplitudeA = pair[0][2] * 5;
+          r.vector.amplitudeB = pair[1][2] * 5;
+        } else if (r.coopMode === "split") {
           const v = r.inputs.owner,
             envelope =
               (1 - Math.cos((((r.tick / 10) * v.bpm) / 60) * Math.PI * 2)) / 2;

@@ -45,6 +45,7 @@ try {
     "admin-browser",
     "qr-browser",
     "lab-browser",
+    "coop-browser",
     "ux-browser",
     "theme-browser",
     "scope-browser",

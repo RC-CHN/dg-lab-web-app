@@ -10,7 +10,7 @@ const categories = {
   "A/B 回声": "制作波形",
   音乐联动: "互动玩法",
   "波形 DJ": "互动玩法",
-  双人协作: "互动玩法",
+  多人协作: "互动玩法",
   互动场景: "互动玩法",
 };
 export async function chooseFeature(page, name) {

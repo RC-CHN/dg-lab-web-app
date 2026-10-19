@@ -73,7 +73,10 @@ POST /api/lab/start {id,epoch,revision,config} 返回当前runId、epoch、revis
   mix：left/right波形数组、mix:0..100、bpm:30..200、quantize、alternate。
   tempo：waves:[frames,...]（1..30个）、bpm:30..200、switchEvery:1..16；服务器生成手动节拍。
   stream：随后通过update发送frames:[frameA,frameB]。
-  coop：coopMode:split|channels、swapSeconds:0..120；需有效协作者在线。
+  coop：coopMode:split|channels|vector、swapSeconds:0..120；需有效协作者在线。
+    vector为A/B非负二维贡献分路求和：min(ΣamplitudeA,capA)、min(ΣamplitudeB,capB)，不求均值。
+    主端配置period:10..100、capA/capB:0..100（默认40ms、100%）；每次启动所有贡献为0。
+    V2幅值只有0..20共21档，输出向下取5%的整数倍，确保不超过上限。
   scene：nodes:[{title,frames,seconds,choices:[{label,to}]}]；to为节点索引，-1为结束。
 POST /api/lab/update {runId,epoch,seq,...patch} seq严格递增；最新sequence在lab公开状态中返回。
   mix可更新mix/bpm；tempo可更新bpm；stream可更新frames；coop更新input中的当前角色字段。
@@ -82,13 +85,21 @@ POST /api/lab/update {runId,epoch,seq,...patch} seq严格递增；最新sequence
 POST /api/lab/choose {runId,epoch,node,revision,choice} 选择当前等待节点的选项索引。
 POST /api/lab/stop {runId,epoch} 只停止对应实验，不改变基础强度；返回新的lab状态与revision。
 
-POST /api/coop/create {id,role,minutes} role为amplitude/channelB/choice；minutes 1..60。
-  返回一次性邀请token；推荐构造同源 /#invite=<token> 链接。
-POST /api/coop/revoke {} 主面板撤销当前邀请。
+POST /api/coop/create {id,role,minutes,name?} role为amplitude/channelB/choice/vector；minutes 1..60。
+  name可选，最多24字符。返回{id,name,token,role,expires}；推荐构造同源 /#invite=<token> 链接。
+  vector邀请累加，主控外最多7个席位，每个链接仍限一个会话；新建非vector邀请会替换所有旧邀请。
+POST /api/coop/revoke {id?} 主面板按邀请id撤销一个；省略id撤销全部。
 POST /api/coop/inspect {token} 查看角色、是否已兑换、是否演示与到期时间。
 POST /api/coop/join {token} 将邀请绑定到当前独立会话，不能与主端同会话。
 POST /api/coop/heartbeat {} 协作端每250ms续期；无法续期时不继续控制。
 POST /api/coop/input {runId,epoch,seq,input:{amplitude}} 或channelB的{amplitude,period}；seq在同一次run内严格递增。
+  vector的input为{amplitudeA,amplitudeB}，各0..100；参与者由服务端会话绑定，不能提交别人的id。
+  主端lab/update的input还允许period/capA/capB；协作者无权改这些字段或基础强度。
+  每个玩家独立seq；guest.inputSequence返回该会话的已接收序号，刷新后从它继续。
+  lab.vector含rawA/rawB、量化后的amplitudeA/amplitudeB、capA/capB、period、participants。
+  participants仅含公开id/name/amplitudeA/amplitudeB，邀请token仅主端可见。
+  vector中单人退出/撤销/断线移除其贡献；1500ms无新输入自动移除，单发heartbeat不会保留旧贡献。
+  还有其他在线协作者时继续；全部协作者离线、主端离线或主端1200ms未续期则停止。
 POST /api/coop/choose {runId,epoch,node,revision,choice} 仅choice角色可用。
 POST /api/coop/stop {runId,epoch} 协作者仅能停止邀请对应模式的该次实验。
 POST /api/coop/exit {} 退出并作废邀请，恢复自己的独立会话。

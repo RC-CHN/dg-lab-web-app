@@ -5,6 +5,7 @@ import { DemoRoom } from "../server/demo.mjs";
 import { createApp } from "../server/index.mjs";
 import {
   ZERO,
+  sumContributions,
   frameValid,
   transformTrack,
   echoTracks,
@@ -22,6 +23,24 @@ const wave = [
   [0, 0, 0],
   [1, 9, 10],
 ];
+test("multiplayer vectors add independently per channel, without averaging or shared normalization", () => {
+  assert.deepEqual(
+    sumContributions(
+      [
+        { amplitudeA: 20, amplitudeB: 80 },
+        { amplitudeA: 30, amplitudeB: 40 },
+      ],
+      70,
+      90,
+    ),
+    { rawA: 50, rawB: 120, amplitudeA: 50, amplitudeB: 90, capA: 70, capB: 90 },
+  );
+  assert.equal(
+    sumContributions([{ amplitudeA: 100, amplitudeB: 0 }], 0).amplitudeA,
+    0,
+  );
+  assert.equal(sumContributions([]).amplitudeB, 0);
+});
 async function roomFixture(t) {
   const room = new DemoRoom();
   await room.attach(0);
@@ -256,6 +275,221 @@ async function httpFixture(t, options = {}) {
   t.after(() => owner.post("demo", { enabled: false }).catch(() => {}));
   return { client, owner, ownerSSE };
 }
+test("multiple independent invitations mix A/B, enforce caps, isolate sequences and revoke only one contributor", async (t) => {
+  const { owner, client } = await httpFixture(t),
+    guests = [await client(), await client()];
+  for (const guest of guests) await guest.events();
+  const invites = [];
+  for (let n = 0; n < 7; n++) {
+    const result = await owner.post("coop/create", {
+      id: 0,
+      role: "vector",
+      name: `Player ${n + 1}`,
+    });
+    assert.equal(result.status, 200);
+    invites.push(result.data);
+  }
+  assert.equal(
+    (await owner.post("coop/create", { id: 0, role: "vector" })).status,
+    409,
+  );
+  for (let n = 0; n < guests.length; n++)
+    assert.equal(
+      (await guests[n].post("coop/join", { token: invites[n].token })).status,
+      200,
+    );
+  const start = await owner.post("lab/start", {
+    id: 0,
+    epoch: 0,
+    revision: 0,
+    config: { mode: "coop", coopMode: "vector", capA: 73, capB: 62 },
+  });
+  assert.equal(start.status, 200);
+  const identity = { runId: start.data.runId, epoch: 0 };
+  assert.equal(
+    (
+      await owner.post("lab/update", {
+        ...identity,
+        seq: 1,
+        input: { amplitudeA: 20, amplitudeB: 10 },
+      })
+    ).status,
+    200,
+  );
+  for (const [n, input] of [
+    { amplitudeA: 30, amplitudeB: 5 },
+    { amplitudeA: 40, amplitudeB: 70 },
+  ].entries())
+    assert.equal(
+      (await guests[n].post("coop/input", { ...identity, seq: 1, input }))
+        .status,
+      200,
+    );
+  await sleep(130);
+  let state = await owner.get();
+  assert.equal(state.lab.vector.rawA, 90);
+  assert.equal(state.lab.vector.rawB, 85);
+  assert.equal(state.lab.vector.amplitudeA, 70);
+  assert.equal(state.lab.vector.amplitudeB, 60);
+  assert.deepEqual(
+    state.lab.frames.map((f) => f[2]),
+    [14, 12],
+  );
+  assert.equal(state.devices[0].props.intensityA, 12);
+  assert.equal(state.devices[0].props.intensityB, 8);
+  const guestState = await guests[0].get();
+  assert.equal(guestState.guest.lab.vector.participants.length, 3);
+  for (const invite of invites)
+    assert(!JSON.stringify(guestState).includes(invite.token));
+  for (const input of [
+    { capA: 100 },
+    { period: 100 },
+    { amplitudeA: -1 },
+    { amplitudeB: 101 },
+    { amplitudeA: "50" },
+    { owner: {} },
+  ])
+    assert.notEqual(
+      (await guests[0].post("coop/input", { ...identity, seq: 2, input }))
+        .status,
+      200,
+    );
+  assert.equal(
+    (
+      await guests[0].post("coop/input", {
+        ...identity,
+        seq: 1,
+        input: { amplitudeA: 100 },
+      })
+    ).status,
+    409,
+  );
+  assert.equal(
+    (await guests[0].post("coop/revoke", { id: invites[1].id })).status,
+    403,
+  );
+  // Removing an unclaimed link must not interrupt the active group.
+  await owner.post("coop/revoke", { id: invites[6].id });
+  assert.equal((await owner.get()).lab.runId, identity.runId);
+  await owner.post("coop/revoke", { id: invites[0].id });
+  await sleep(130);
+  state = await owner.get();
+  assert.equal(state.lab.runId, identity.runId);
+  assert.equal(state.lab.vector.rawA, 60);
+  assert.equal(state.lab.vector.rawB, 80);
+  assert.equal(state.lab.vector.participants.length, 2);
+  assert.equal(
+    (
+      await guests[0].post("coop/input", {
+        ...identity,
+        seq: 2,
+        input: { amplitudeA: 100 },
+      })
+    ).status,
+    410,
+  );
+  assert.equal(
+    (
+      await owner.post("lab/update", {
+        ...identity,
+        seq: 2,
+        input: { capA: 0, capB: 25 },
+      })
+    ).status,
+    200,
+  );
+  await sleep(130);
+  assert.deepEqual(
+    (await owner.get()).lab.frames.map((f) => f[2]),
+    [0, 5],
+  );
+  assert.equal((await guests[1].post("coop/stop", identity)).status, 200);
+  assert.equal((await owner.get()).lab.running, false);
+  assert.equal(
+    (
+      await guests[1].post("coop/input", {
+        ...identity,
+        seq: 3,
+        input: { amplitudeB: 99 },
+      })
+    ).status,
+    409,
+  );
+});
+test("multiplayer drops stale or disconnected contributions while the remaining players continue", async (t) => {
+  const { owner, client } = await httpFixture(t),
+    guests = [await client(), await client()],
+    streams = [];
+  for (const guest of guests) {
+    streams.push(await guest.events());
+    const invite = (await owner.post("coop/create", { id: 0, role: "vector" }))
+      .data;
+    await guest.post("coop/join", { token: invite.token });
+  }
+  const r = (
+    await owner.post("lab/start", {
+      id: 0,
+      epoch: 0,
+      revision: 0,
+      config: { mode: "coop", coopMode: "vector" },
+    })
+  ).data;
+  const identity = { runId: r.runId, epoch: 0 };
+  await guests[0].post("coop/input", {
+    ...identity,
+    seq: 1,
+    input: { amplitudeA: 50, amplitudeB: 0 },
+  });
+  let seq = 1;
+  const heartbeat = async () => {
+    await owner.post("lab/update", { ...identity, seq: ++seq });
+    await guests[1].post("coop/input", {
+      ...identity,
+      seq,
+      input: { amplitudeA: 0, amplitudeB: 40 },
+    });
+  };
+  await heartbeat();
+  const timer = setInterval(() => heartbeat().catch(() => {}), 200);
+  t.after(() => clearInterval(timer));
+  await sleep(1750);
+  let state = await owner.get();
+  assert.equal(state.lab.runId, r.runId);
+  assert.deepEqual(
+    state.lab.frames.map((f) => f[2]),
+    [0, 8],
+  );
+  // A still-open SSE stream and heartbeat cannot preserve an expired input.
+  await guests[0].post("coop/heartbeat");
+  await sleep(130);
+  assert.equal((await owner.get()).lab.vector.amplitudeA, 0);
+  await guests[0].post("coop/input", {
+    ...identity,
+    seq: 2,
+    input: { amplitudeA: 25, amplitudeB: 0 },
+  });
+  await sleep(130);
+  assert.equal((await owner.get()).lab.vector.amplitudeA, 25);
+  streams[0].abort();
+  await sleep(150);
+  state = await owner.get();
+  assert.equal(state.lab.runId, r.runId);
+  assert.equal(state.lab.vector.amplitudeA, 0);
+  assert.equal(
+    (
+      await guests[0].post("coop/input", {
+        ...identity,
+        seq: 3,
+        input: { amplitudeA: 80 },
+      })
+    ).status,
+    403,
+  );
+  clearInterval(timer);
+  streams[1].abort();
+  await sleep(150);
+  assert.equal((await owner.get()).lab.running, false);
+});
 test("guest roles are scoped, do not expose owner secrets, invite is single-use and revocable", async (t) => {
   const { client, owner } = await httpFixture(t),
     guest = await client(),

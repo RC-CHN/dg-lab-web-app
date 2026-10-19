@@ -1,5 +1,22 @@
 export const ZERO = Object.freeze([0, 0, 0]);
 export const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+export const COOP_GUEST_LIMIT = 7;
+export const coopRole = (mode) =>
+  ({ split: "amplitude", channels: "channelB", vector: "vector" })[
+    mode || "split"
+  ];
+export function sumContributions(inputs, capA = 100, capB = 100) {
+  const rawA = inputs.reduce((sum, v) => sum + v.amplitudeA, 0);
+  const rawB = inputs.reduce((sum, v) => sum + v.amplitudeB, 0);
+  return {
+    rawA,
+    rawB,
+    amplitudeA: Math.min(rawA, capA),
+    amplitudeB: Math.min(rawB, capB),
+    capA,
+    capB,
+  };
+}
 export function number(value, min, max, label = "参数") {
   if (!Number.isFinite(value) || value < min || value > max)
     throw Error(`${label}应在 ${min}–${max} 之间`);

@@ -14,7 +14,7 @@ resources:
 images:
   - name: ghcr.io/rc-chn/dg-lab-web-app
     newName: harbor.example.com/ghcr/rc-chn/dg-lab-web-app
-    newTag: v1.9.1
+    newTag: v1.10.0
 patches:
   - target:
       kind: ConfigMap

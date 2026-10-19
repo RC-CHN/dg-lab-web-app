@@ -638,3 +638,133 @@
     font-size: 8px;
   }
 }
+.vector-summary,
+.vector-settings {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.vector-meters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.vector-meter {
+  color: var(--accent);
+  min-width: 0;
+}
+.vector-meter.channel-b {
+  color: var(--mint);
+}
+.vector-meter > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.vector-meter output {
+  font-size: clamp(24px, 5vw, 40px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.vector-meter-track {
+  height: 12px;
+  position: relative;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  margin: 8px 0;
+}
+.vector-meter-track i {
+  display: block;
+  height: 100%;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+  transition: width 200ms ease-out;
+}
+.vector-meter-track > span {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: currentColor;
+  transform: translateX(-2px);
+}
+.vector-meter small {
+  display: block;
+  min-height: 2em;
+  font-size: 11px;
+}
+.vector-contributors {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  margin-top: 14px;
+}
+.vector-contributors > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 65px 65px;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.vector-contributors > div > span:first-child {
+  overflow-wrap: anywhere;
+}
+.vector-contributors > div > span:nth-child(2) {
+  color: var(--accent);
+}
+.vector-contributors > div > span:nth-child(3) {
+  color: var(--mint);
+}
+.vector-controls .play-settings {
+  margin-bottom: 12px;
+}
+.vector-settings summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+.vector-settings[open] summary {
+  margin-bottom: 18px;
+}
+.invite-roster {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.invite-player {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.invite-player .section-heading {
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+}
+.invite-player .invite-url {
+  margin: 0 0 8px;
+}
+.invite-player .invite-url input {
+  width: 0;
+  min-width: 0;
+  flex: 1;
+}
+.invite-player small {
+  font-size: 11px;
+}
+@media (max-width: 480px) {
+  .vector-summary {
+    padding: 12px;
+  }
+  .vector-meters {
+    gap: 14px;
+  }
+  .multi-invitation > .section-heading {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vector-meter-track i {
+    transition: none;
+  }
+}

@@ -516,7 +516,7 @@ export function createApp({
     authenticated(s);
     return coop.create(s, body);
   });
-  route("/api/coop/revoke", (s) => coop.revoke(s));
+  route("/api/coop/revoke", (s, body) => coop.revoke(s, body.id));
   route("/api/coop/inspect", (s, body) => coop.inspect(body.token));
   route("/api/coop/join", (s, body) => coop.join(s, body.token));
   route("/api/coop/heartbeat", (s) => coop.heartbeat(s));

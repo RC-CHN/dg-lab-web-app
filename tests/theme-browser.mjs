@@ -118,7 +118,10 @@ try {
   assert.deepEqual(mutations, []);
   page.off("request", observe);
   await page.getByRole("button", { name: "停止并归零", exact: true }).click();
-  await chooseFeature(page, "双人协作");
+  await chooseFeature(page, "多人协作");
+  await page
+    .getByRole("combobox", { name: "合作方式", exact: true })
+    .selectOption("split");
   await page.getByRole("button", { name: "创建邀请链接", exact: true }).click();
   const invite = await page
     .getByLabel("邀请链接", { exact: true })
