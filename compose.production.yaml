@@ -7,6 +7,9 @@ services:
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8787}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       ADMIN_SESSION_HOURS: ${ADMIN_SESSION_HOURS:-168}
+      CONNECTION_PRESET_FILE: /data/connection-preset.json
+    volumes:
+      - panel_settings:/data
     ports:
       - "${BIND_ADDRESS:-127.0.0.1}:8787:8787"
     read_only: true
@@ -33,5 +36,6 @@ services:
     depends_on:
       - panel
 volumes:
+  panel_settings:
   caddy_data:
   caddy_config:

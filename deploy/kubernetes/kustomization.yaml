@@ -4,5 +4,6 @@ namespace: dg-lab-web-app
 resources:
   - namespace.yaml
   - configmap.yaml
+  - pvc.yaml
   - deployment.yaml
   - service.yaml

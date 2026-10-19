@@ -5,6 +5,7 @@ import { chromium, expect } from "@playwright/test";
 import assert from "node:assert/strict";
 import { chooseFeature } from "./navigation.mjs";
 const name = `dglab-ux-smoke-${process.pid}`;
+const volume = `${name}-settings`;
 const password = randomBytes(24).toString("base64url");
 const origin = "http://127.0.0.1:8791";
 let browser,
@@ -21,6 +22,8 @@ try {
       "--read-only",
       "--tmpfs",
       "/tmp",
+      "--mount",
+      `type=volume,source=${volume},target=/data`,
       "--cap-drop",
       "ALL",
       "--security-opt",
@@ -31,6 +34,8 @@ try {
       "ADMIN_PASSWORD",
       "-e",
       `APP_ORIGIN=${origin}`,
+      "-e",
+      "CONNECTION_PRESET_FILE=/data/connection-preset.json",
       "dglab-panel:local",
     ],
     { env: { ...process.env, ADMIN_PASSWORD: password }, stdio: "pipe" },
@@ -86,6 +91,14 @@ try {
   await expect(
     page.getByLabel("远程码或邀请链接", { exact: true }),
   ).toBeHidden();
+  const saved = await page.evaluate(async () => {
+    const s = await fetch("/api/state").then((r) => r.json());
+    return (await fetch("/api/connection/save", {
+      method: "POST", headers: { "Content-Type": "application/json", "X-Panel-CSRF": s.csrf },
+      body: JSON.stringify({ phone: "15500000000", password: "Fixture-Saved-Only-2026", code: "TEST1234" }),
+    })).status;
+  });
+  assert.equal(saved, 200, "non-root container must be able to write its settings volume");
   await page.getByRole("link", { name: "返回控制台", exact: true }).click();
   await page.getByRole("button", { name: "先体验演示", exact: true }).click();
   await page.getByRole("button", { name: "接管设备", exact: true }).click();
@@ -158,11 +171,32 @@ try {
   await expect(
     page.getByRole("heading", { name: "管理员入口", exact: true }),
   ).toBeVisible();
+  execFileSync("docker", ["restart", name], { stdio: "pipe" });
+  for (let i = 0; i < 50; i++) {
+    try { if ((await fetch(`${origin}/healthz`)).ok) break; } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  await page.goto(`${origin}/admin`);
+  await page.getByLabel("管理员口令", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "进入管理面板", exact: true }).click();
+  await expect(page.locator(".connection-preset").getByText("已持久保存", { exact: true })).toBeVisible();
+  const restored = await page.evaluate(() => fetch("/api/state").then((r) => r.json()));
+  assert.equal(restored.connectionPreset.code, "TEST1234");
+  assert.equal(restored.user, null);
+  assert(!JSON.stringify(restored).includes("Fixture-Saved-Only-2026"));
   assert.deepEqual(errors, []);
   console.log(
-    "Production Docker passed: read-only container, three themes and analog meter, admin authentication, server-owned playback through admin navigation, live scope, global stop and logout. No official service used.",
+    "Production Docker passed: read-only container, three themes, admin authentication, background playback, scope, stop and persisted credentials across container restart. No official service used.",
   );
 } finally {
   await browser?.close();
   if (started) execFileSync("docker", ["stop", name], { stdio: "pipe" });
+  // --rm container removal can finish just after docker stop returns.
+  for (let attempt = 0; attempt < 50; attempt++) {
+    try { execFileSync("docker", ["volume", "rm", "-f", volume], { stdio: "pipe" }); break; }
+    catch (error) {
+      if (attempt === 49) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
 }

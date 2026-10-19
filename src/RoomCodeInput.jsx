@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ClipboardPaste, ImagePlus } from "lucide-react";
 import { readRoomQr } from "./room-qr.js";
 
-export default function RoomCodeInput({ value, onChange, disabled, onBusy }) {
+export default function RoomCodeInput({ value, onChange, disabled, onBusy, label = "远程码或邀请链接", successMessage = "已识别，点击加入房间" }) {
   const input = useRef(), fileInput = useRef(), generation = useRef(0);
   const [reading, setReading] = useState(false);
   const [message, setMessage] = useState(null);
@@ -20,7 +20,7 @@ export default function RoomCodeInput({ value, onChange, disabled, onBusy }) {
       const code = await readRoomQr(await getFile());
       if (generation.current !== attempt) return;
       onChange(code);
-      setMessage({ text: "已识别，点击加入房间" });
+      setMessage({ text: successMessage });
       input.current?.focus();
     } catch (error) {
       if (generation.current === attempt)
@@ -46,7 +46,7 @@ export default function RoomCodeInput({ value, onChange, disabled, onBusy }) {
   return (
     <div className="room-code-input" aria-busy={reading}>
       <label className="field">
-        <span>远程码或邀请链接</span>
+        <span>{label}</span>
         <input ref={input} placeholder="粘贴邀请链接或二维码图片" autoComplete="off"
           value={value} required disabled={disabled}
           onChange={event => { cancel(); setMessage(null); onChange(event.target.value); }} />

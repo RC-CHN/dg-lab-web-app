@@ -29,7 +29,7 @@ export class MockRoom extends Room {
     this.info = { id: "fixture-room", code, region: "test" };
     this.status = "connected";
     this.peer = { nickname: "测试房主" };
-    this.devices = new DemoRoom().devices;
+    this.devices = code === "EMPTYROOM" ? [] : new DemoRoom().devices;
     this.log("已加入测试房间");
     return this.publicState();
   }

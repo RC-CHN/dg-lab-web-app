@@ -43,12 +43,14 @@ try {
   for (const file of [
     "browser",
     "admin-browser",
+    "preset-browser",
     "qr-browser",
     "lab-browser",
     "coop-browser",
     "ux-browser",
     "theme-browser",
     "scope-browser",
+    "scope-empty-browser",
     "parity-browser",
   ]) {
     child = spawn(process.execPath, [`tests/${file}.mjs`], {

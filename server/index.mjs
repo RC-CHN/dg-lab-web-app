@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { DgApi, ApiError, parseRoomCode } from "./dg-api.mjs";
 import { Room } from "./room.mjs";
 import { Cooperation } from "./cooperation.mjs";
+import { ConnectionPreset } from "./connection-preset.mjs";
 import { DemoRoom } from "./demo.mjs";
 import { AdminAuth, adminSessionTtl } from "./admin-auth.mjs";
 import { generateV2, makeCustomPulse } from "../shared/pulse-v2.mjs";
@@ -31,11 +32,13 @@ export function createApp({
   adminPassword = process.env.ADMIN_PASSWORD || "",
   adminTtlMs = adminSessionTtl(),
   offlineGraceMs = 15000,
+  connectionPresetFile = process.env.CONNECTION_PRESET_FILE || "",
 } = {}) {
   const app = express();
   const ttl = Math.max(24 * 60 * 60 * 1000, adminTtlMs);
   app.disable("x-powered-by");
   const coop = new Cooperation(),
+    connectionPreset = new ConnectionPreset(connectionPresetFile),
     auth = new AdminAuth(adminPassword);
   const sessions = new Map(),
     loginAttempts = new Map();
@@ -110,6 +113,7 @@ export function createApp({
     return {
       ...base,
       user: isAdmin(s) && s.user ? { nickname: s.user.nickname } : null,
+      ...(isAdmin(s) ? { connectionPreset: connectionPreset.publicState() } : {}),
       demo: isDemo(s),
       cooperation: coop.ownerState(s),
       ...s.room.publicState(),
@@ -354,7 +358,7 @@ export function createApp({
     if (!s.api.token && !isDemo(s))
       throw new ApiError("请先在管理员面板登录 DG-LAB 账号", 401);
   };
-  route("/api/login", async (s, body, req) => {
+  const loginOfficial = async (s, body, req) => {
     if (s.room.info) throw new ApiError("请先退出当前房间");
     const ip = req.socket.remoteAddress || "local",
       recent = (loginAttempts.get(ip) || []).filter(
@@ -375,6 +379,29 @@ export function createApp({
       candidate.cookies?.clear();
       throw error;
     }
+  };
+  route("/api/login", loginOfficial);
+  const emitPreset = () => {
+    for (const session of sessions.values()) if (isAdmin(session)) session.emit();
+  };
+  route("/api/connection/save", (s, body) => {
+    const result = connectionPreset.save(body);
+    emitPreset();
+    return result;
+  });
+  route("/api/connection/clear", () => {
+    const result = connectionPreset.clear();
+    emitPreset();
+    return result;
+  });
+  route("/api/connection/connect", async (s, body, req) => {
+    const saved = connectionPreset.credentials(), revision = connectionPreset.revision;
+    await loginOfficial(s, saved, req);
+    if (revision !== connectionPreset.revision) throw new ApiError("预设已更新，请重新连接", 409);
+    const version = s.connectionVersion;
+    await s.room.join(saved.code, saved.roomPassword);
+    current(s, version);
+    return state(s);
   });
   route("/api/logout", (s) => {
     replaceConnection(s);

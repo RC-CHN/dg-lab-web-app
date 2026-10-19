@@ -14,7 +14,7 @@ resources:
 images:
   - name: ghcr.io/rc-chn/dg-lab-web-app
     newName: harbor.example.com/ghcr/rc-chn/dg-lab-web-app
-    newTag: v1.10.0
+    newTag: v1.11.0
 patches:
   - target:
       kind: ConfigMap
@@ -57,4 +57,6 @@ curl --fail https://panel.example.com/healthz
 
 升级时修改 overlay 的镜像标签或 digest，再执行 dry-run、apply 和 rollout status。回滚用 `kubectl -n dg-lab-web-app rollout undo deployment/dg-lab-web-app`，并将 overlay 改回原镜像，避免下次 apply 再覆盖。
 
-会话、官方登录和正在运行的任务保存在进程内存中，因此保持一个副本，使用 [Recreate 更新策略](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#recreate-deployment)。重启或升级后需要重新登录、加入房间并开始播放；挂载 PVC 不会改变这一点。普通网页切页或锁屏不会重启服务。
+会话、官方登录令牌和正在运行的任务保存在进程内存中，因此保持一个副本，使用 [Recreate 更新策略](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#recreate-deployment)。重启或升级后重新认证，再一键连接保存的预设；不会自动恢复输出。普通网页切页或锁屏不会重启服务。
+
+连接预设单独保存在 `dg-lab-web-app-settings` PVC（默认存储类，1Gi）上的 `/data/connection-preset.json`，文件权限为 0600。管理员可在网页保存、修改和清除；密码不出现在状态接口中。PVC 包含账号凭据，备份应保留在私有存储，删除 PVC 会丢失预设。可在部署覆盖层选择适合节点迁移的 StorageClass；使用 local-path 时卷绑定到原节点。

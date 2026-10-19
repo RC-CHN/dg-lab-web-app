@@ -28,11 +28,14 @@ export function ScopeCanvas({
     latest = useRef({});
   const previous = latest.current;
   latest.current = {
-    lanes: lanes.map((lane, c) => ({
-      ...lane,
-      received: previous.lanes?.[c]?.serverTime === lane.serverTime
-        ? previous.lanes[c].received : performance.now(),
-    })),
+    lanes: lanes.map((lane, c) => {
+      const cached = previous.lanes?.[c];
+      return {
+        ...lane,
+        received: cached && cached.serverTime === lane.serverTime
+          ? cached.received : performance.now(),
+      };
+    }),
     online,
   };
   useEffect(() => {

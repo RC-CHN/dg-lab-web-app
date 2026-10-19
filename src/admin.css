@@ -610,3 +610,8 @@
     scroll-behavior: auto;
   }
 }
+.connection-preset details { margin-top: 16px; }
+.connection-preset summary { cursor: pointer; font-size: 13px; }
+.connection-preset form { display: grid; gap: 16px; margin-top: 18px; }
+.connection-preset .section-heading { gap: 12px; flex-wrap: wrap; }
+.connection-preset .preset-account { overflow-wrap: anywhere; margin: 8px 0 16px; }

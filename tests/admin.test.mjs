@@ -5,6 +5,9 @@ import { createApp } from "../server/index.mjs";
 import { Room } from "../server/room.mjs";
 import { ADMIN_PASSWORD, mockApi, MockRoom } from "./fixtures.mjs";
 import { adminSessionTtl } from "../server/admin-auth.mjs";
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function fixture(t, options = {}) {
   const rooms = [];
@@ -80,6 +83,34 @@ const connect = async (c) => {
   );
   assert.equal((await c.request("device/attach", { id: 0 })).status, 200);
 };
+test("only administrators manage persisted credentials; reconnect after a server restart never acquires a device", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dglab-admin-preset-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const options = { connectionPresetFile: path.join(dir, "preset.json") };
+  const first = await fixture(t, options), a = await first.client(), outsider = await first.client();
+  const body = { phone: "15500000000", password: "fixture-secret", code: "EMPTYROOM" };
+  for (const op of ["save", "clear", "connect"])
+    assert.equal((await outsider.request(`connection/${op}`, body)).status, 401);
+  await outsider.request("demo", { enabled: true });
+  assert.equal((await outsider.request("connection/save", body)).status, 401);
+  assert.equal((await outsider.request("state")).data.connectionPreset, undefined);
+  await auth(a);
+  assert.equal((await a.request("connection/save", body)).status, 200);
+  const state = (await a.request("state")).data;
+  assert.equal(state.connectionPreset.configured, true);
+  assert(!JSON.stringify(state).includes(body.password));
+  const second = await fixture(t, options), b = await second.client();
+  assert.equal((await b.request("state")).data.connectionPreset, undefined);
+  await auth(b);
+  assert.equal((await b.request("state")).data.connectionPreset.code, "EMPTYROOM");
+  assert.equal((await b.request("connection/connect", {})).status, 200);
+  const connected = (await b.request("state")).data;
+  assert.equal(connected.status, "connected"); assert.equal(connected.devices.length, 0);
+  assert.equal((await b.request("connection/connect", {})).status, 400);
+  await b.request("connection/clear", {});
+  assert.equal(fs.existsSync(options.connectionPresetFile), false);
+  assert.equal((await b.request("state")).data.connectionPreset.configured, false);
+});
 
 test("admin configuration fails closed, wrong password and login throttle are enforced", async (t) => {
   const absent = await fixture(t, { adminPassword: "" }),

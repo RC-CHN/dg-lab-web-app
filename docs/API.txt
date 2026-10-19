@@ -16,6 +16,11 @@ POST /api/admin/login      {password} 面板管理员口令，返回完整state�
 POST /api/admin/logout     {} 立即撤权、停止、断开房间并撤销邀请，返回新的匿名state
 
 POST /api/login            {phone,password,phoneCountryCode:"86"} 或 {email,password} 或 {token}
+POST /api/connection/save  {phone或email,password,phoneCountryCode?,code,roomPassword?,clearRoomPassword?}
+  仅管理员可用；需配置CONNECTION_PRESET_FILE。原子写入服务器0600文件；同一账号密码留空保留已存值。
+POST /api/connection/clear {} 删除持久预设；不影响当前已建立的连接。
+POST /api/connection/connect {} 用已保存账号登录并加入预设房间，不接管设备、不播放。
+  connectionPreset仅出现在管理员state中，包含available/configured/phone/email/code/hasPassword/hasRoomPassword/revision；不返回密码。
 POST /api/logout           {}
 POST /api/demo             {enabled:true|false}
 POST /api/room/join        {code:"远程码或邀请链接",password?:"房间密码"}

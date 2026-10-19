@@ -21,6 +21,7 @@ import { Field } from "./App.jsx";
 import "./admin.css";
 import { ThemeSwitch } from "./Theme.jsx";
 import RoomCodeInput from "./RoomCodeInput.jsx";
+import ConnectionPreset from "./ConnectionPreset.jsx";
 
 function Step({
   number,
@@ -313,6 +314,7 @@ export default function Admin({
               {notice}
             </div>
           )}
+          <ConnectionPreset preset={state.connectionPreset} disabled={disabled} inRoom={!!state.room} command={command} />
           {acquired ? (
             <section className="connection-ready">
               <div>
